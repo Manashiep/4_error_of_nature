@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -9,6 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::controller(PublicController::class)->group(function () {
     Route::get('/', 'home')->name('home');
     Route::get('/services', 'services')->name('services.index');
+    // Route::get('/transport', 'transport')->name('transport');
     Route::get('/services/{service:slug}', 'service')->name('services.show');
     Route::get('/actualites', 'announcements')->name('annonces.index');
     Route::get('/actualites/{announcement:slug}', 'announcement')->name('annonces.show');
@@ -29,7 +31,7 @@ Route::middleware('auth')->group(function () {
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
+    Route::get('/dashboard', DashboardController::class)->name('dashboard');
 });
 use App\Http\Controllers\ActualiteController;
 

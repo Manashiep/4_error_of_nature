@@ -31,14 +31,11 @@ class ReportForm
                             ->label('Référence du dossier')
                             ->disabled()
                             ->dehydrated(false), // Ne pas essayer de sauvegarder si désactivé
-
-                        Select::make('status')
-                            ->label('Statut de prise en charge')
-                            ->options([
-                                'pending' => 'En attente',
-                                'in_progress' => 'En cours de traitement',
-                                'resolved' => 'Résolu',
-                                'rejected' => 'Rejeté',
+                    Select::make('status')
+                        ->label('Statut')
+                        ->options(\App\Models\Report::STATUSES)
+                        ->default('pending')
+                        ->required(),
                             ])
                             ->required(),
 
@@ -66,11 +63,12 @@ class ReportForm
                             ->columnSpanFull(),
 
                         FileUpload::make('image_path')
-                            ->label('Photo preuve / Illustration')
-                            ->image()
-                            ->directory('reports')
-                            ->columnSpanFull(),
-                    ])->columns(2),
+                                ->label('Photo')
+                                ->image()
+                                ->disk('public')
+                                ->directory('reports')
+                                ->visibility('public'),
+                    
             ]);
     }
 }

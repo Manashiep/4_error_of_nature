@@ -2,11 +2,8 @@
 
 namespace App\Filament\Resources\Services\Schemas;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Section;
-use App\Filament\Resources\ServiceResource\Pages;
 use App\Models\Service;
+<<<<<<< HEAD
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -20,6 +17,17 @@ use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\TextInput;
+=======
+use Filament\Forms\Components\FileUpload;
+use Filament\Forms\Components\RichEditor;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
+>>>>>>> 43fa5090cfc0c24541c11bd82c9e3754a1c73ecd
 
 class ServiceForm
 {
@@ -33,12 +41,16 @@ class ServiceForm
                             ->label('Nom du service')
                             ->required()
                             ->live(onBlur: true)
+<<<<<<< HEAD
                             ->afterStateUpdated(function ($set, ?string $state) {
                                 if (blank($state)) {
                                     return;
                                 }
                                 $set('slug', Str::slug($state));
                             }),
+=======
+                            ->afterStateUpdated(fn ($set, $state) => $set('slug', Str::slug($state))),
+>>>>>>> 43fa5090cfc0c24541c11bd82c9e3754a1c73ecd
 
                         TextInput::make('slug')
                             ->label('Identifiant URL (Slug)')
@@ -51,6 +63,7 @@ class ServiceForm
                             ->options([
                                 'Général' => 'Général',
                                 'Voirie & Infrastructure' => 'Voirie & Infrastructure',
+                                'Transport' => 'Transport',
                                 'Santé & Social' => 'Santé & Social',
                                 'État Civil & Administratif' => 'État Civil & Administratif',
                                 'Environnement & Propreté' => 'Environnement & Propreté',
@@ -75,6 +88,7 @@ class ServiceForm
                         FileUpload::make('image_path')
                             ->label('Illustration / Photo du service')
                             ->image()
+                            ->disk('public')
                             ->directory('services')
                             ->visibility('public'),
 

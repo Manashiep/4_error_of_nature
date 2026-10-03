@@ -61,8 +61,11 @@ class Service extends Model
             return null;
         }
 
-        return Str::startsWith($this->image_path, ['http://', 'https://', '/'])
-            ? $this->image_path
-            : asset('storage/'.$this->image_path);
+        if (Str::startsWith($this->image_path, ['http://', 'https://', '/'])) {
+            return $this->image_path;
+        }
+
+        // Tolère un chemin enregistré avec le préfixe "public/"
+        return asset('storage/'.ltrim(Str::after($this->image_path, 'public/'), '/'));
     }
 }
