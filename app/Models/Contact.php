@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-class create_contacts_table extends Model
+class Contact extends Model
 {
     protected $fillable = [
         'type',
