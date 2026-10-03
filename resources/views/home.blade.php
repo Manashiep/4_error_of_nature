@@ -18,6 +18,11 @@
         </form>
 
         <div class="flex flex-wrap gap-3">
+            {{-- NOUVEAU : bouton rouge de signalement --}}
+            <a href="{{ route('signalement') }}"
+               class="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-3 font-bold text-white no-underline shadow-lg shadow-red-600/30 transition hover:-translate-y-0.5 hover:bg-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white hc:border-2 hc:border-white hc:bg-black">
+                <span aria-hidden="true">⚠</span> Signaler un problème
+            </a>
             <x-public.button variant="alt" :href="route('services.index')">Voir les services</x-public.button>
             @guest
                 <x-public.button variant="alt" :href="route('register')">Créer mon compte</x-public.button>

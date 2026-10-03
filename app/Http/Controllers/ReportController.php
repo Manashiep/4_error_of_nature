@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
 
-/** F25 : signalement d'un problème. Création et soutien réservés aux habitants connectés ; consultation publique. */
 class ReportController extends Controller
 {
     public function create(): View
@@ -19,14 +18,14 @@ class ReportController extends Controller
     public function store(Request $request): RedirectResponse
     {
         $data = $request->validate([
-            'category' => ['required', 'in:'.implode(',', Report::CATEGORIES)],
+            'category'    => ['required', 'in:'.implode(',', Report::CATEGORIES)],
             'description' => ['required', 'string', 'min:10', 'max:2000'],
-            'location' => ['required', 'string', 'max:255'],
+            'location'    => ['required', 'string', 'max:255'],
         ], [
-            'required' => 'Le champ « :attribute » est obligatoire.',
+            'required'   => 'Le champ « :attribute » est obligatoire.',
             'min.string' => 'Le champ « :attribute » doit contenir au moins :min caractères.',
             'max.string' => 'Le champ « :attribute » ne doit pas dépasser :max caractères.',
-            'in' => 'Choisissez un type de problème dans la liste.',
+            'in'         => 'Choisissez un type de problème dans la liste.',
         ], [
             'category' => 'type de problème', 'description' => 'description', 'location' => 'lieu',
         ]);
@@ -35,14 +34,14 @@ class ReportController extends Controller
 
         Report::create($data + [
             'reference' => $reference,
-            'user_id' => $request->user()->id,
-            'status' => 'nouveau',
+            'user_id'   => $request->user()->id,
+            'title'     => $data['category'].' : '.Str::limit($data['location'], 60),
+            'status'    => 'pending',
         ]);
 
         return redirect(route('signalement').'#confirmation')->with('sent', $reference);
     }
 
-    // Public : demandes des habitants, les plus soutenues d'abord
     public function index(Request $request): View
     {
         $cat = $request->query('categorie');
@@ -53,33 +52,32 @@ class ReportController extends Controller
         return view('demandes.index', [
             'items' => Report::withCount('supports')
                 ->when($cat, fn ($b) => $b->where('category', $cat))
-                ->orderByRaw("case status when 'traite' then 1 else 0 end")
-                ->orderByDesc('supports_count')->latest()
+                ->orderByRaw("case when status in ('resolved','rejected') then 1 else 0 end")
+                ->orderByDesc('supports_count')
+                ->latest()
                 ->simplePaginate(9)->withQueryString(),
-            'cat' => $cat,
+            'cat'        => $cat,
             'categories' => Report::CATEGORIES,
         ]);
     }
 
-    // Public : détail d'une demande + bouton Soutenir
     public function show(Request $request, Report $report): View
     {
         $user = $request->user();
 
         return view('demandes.show', [
-            'report' => $report->loadCount('supports'),
-            'mine' => $user && $report->user_id === $user->id,
+            'report'    => $report->loadCount('supports'),
+            'mine'      => $user && $report->user_id === $user->id,
             'supported' => $user ? $report->supports()->where('user_id', $user->id)->exists() : false,
         ]);
     }
 
-    // Habitant connecté : soutenir une demande existante (une seule fois par habitant)
     public function support(Request $request, Report $report): RedirectResponse
     {
         $to = route('demandes.show', $report).'#soutien';
 
-        if ($report->status === 'traite') {
-            return redirect($to)->with('info', 'Cette demande est déjà traitée : elle ne peut plus être soutenue.');
+        if ($report->is_closed) {
+            return redirect($to)->with('info', 'Cette demande est clôturée : elle ne peut plus être soutenue.');
         }
         if ($report->user_id === $request->user()->id) {
             return redirect($to)->with('info', 'Vous êtes à l\'origine de cette demande : elle compte déjà.');

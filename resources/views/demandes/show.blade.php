@@ -1,17 +1,14 @@
 @extends('layouts.public', ['title' => $report->category.' – '.$report->location])
 
 @section('content')
-@php
-    $n = $report->supports_count;
-    $tone = match ($report->status) { 'traite' => 'border-ok/70 text-ok', 'en_cours' => 'border-violet/70 text-violet', default => 'border-cyan/60 text-cyan' };
-@endphp
+@php $n = $report->supports_count; @endphp
 <x-public.breadcrumb :items="[['Demandes des habitants', '/demandes'], [$report->category]]" />
 
 <x-public.panel as="article" class="my-4 p-7" aria-labelledby="titre">
     <p class="flex flex-wrap items-center gap-3 text-[.9rem]">
         <time datetime="{{ $report->created_at->toDateString() }}" class="font-bold text-cyan">Déposée le {{ $report->created_at->locale('fr')->translatedFormat('j F Y') }}</time>
         <span class="rounded-full border border-edge px-3 py-0.5 text-[.8rem]">{{ $report->category }}</span>
-        <span class="rounded-full border px-3 py-0.5 text-[.8rem] {{ $tone }}">{{ $report->status_label }}</span>
+        <span class="rounded-full border px-3 py-0.5 text-[.8rem] {{ $report->status_tone }}">{{ $report->status_label }}</span>
     </p>
     <h1 id="titre" class="mt-3 font-hud text-[clamp(1.4rem,4vw,2.2rem)] font-light leading-[1.1] tracking-tight">{{ $report->category }}</h1>
     <p class="mt-2 text-[1.1rem] text-mute">Lieu : {{ $report->location }}</p>
@@ -38,8 +35,10 @@
         @endif
 
         <div class="mt-4">
-            @if ($report->status === 'traite')
-                <p class="text-mute">Cette demande est traitée : elle ne peut plus être soutenue.</p>
+            @if ($report->is_closed)
+                <p class="text-mute">
+                    {{ $report->status === 'resolved' ? 'Cette demande est résolue' : 'Cette demande a été rejetée' }} : elle ne peut plus être soutenue.
+                </p>
             @elseif (! auth()->check())
                 <p class="mb-3 text-mute">Connectez-vous pour soutenir cette demande.</p>
                 <x-public.button :href="route('login')">Me connecter</x-public.button>
