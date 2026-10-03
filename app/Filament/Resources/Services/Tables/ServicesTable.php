@@ -21,6 +21,7 @@ class ServicesTable
             ->columns([
                 ImageColumn::make('image_path')
                     ->label('Illustration')
+                    ->disk('public')
                     ->square(),
 
                 TextColumn::make('name')

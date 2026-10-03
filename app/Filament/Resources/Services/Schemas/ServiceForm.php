@@ -60,12 +60,13 @@ class ServiceForm
 
                 Section::make('Médias & Contacts')
                     ->schema([
-                        FileUpload::make('image_path')
-                            ->label('Illustration / Photo du service')
-                            ->image()
-                            ->disk('public')
-                            ->directory('services')
-                            ->visibility('public'),
+                        FileUpload::make('image_path') // ou 'image' selon le nom dans ta BDD
+    ->label('Image du service')
+    ->image()
+    ->disk('public')
+    ->directory('services')
+    ->visibility('public')
+    ->preserveFilenames(),
 
                         TextInput::make('contact_email')
                             ->label('Courriel de contact')

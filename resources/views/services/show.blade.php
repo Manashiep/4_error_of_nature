@@ -75,7 +75,7 @@
             <x-public.field name="name" label="Nom" required autocomplete="name" :value="auth()->user()?->name" />
             <x-public.field name="email" label="Adresse e-mail" type="email" required autocomplete="email" :value="auth()->user()?->email" />
             <x-public.field name="message" label="Votre message" type="textarea" required help="Décrivez précisément votre demande ou votre difficulté." />
-            <x-public.button class="w-full">Envoyer un message</x-public.button>
+            <x-public.button class="w-full">Prendre rendez-vous</x-public.button>
         </form>
     </x-public.panel>
 </div>

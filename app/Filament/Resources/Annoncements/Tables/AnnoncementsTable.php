@@ -23,6 +23,7 @@ class AnnoncementsTable
             ->columns([
                 ImageColumn::make('image_path')
                     ->label('Illustration')
+                    ->disk('public')
                     ->circular(),
 
                 TextColumn::make('title')

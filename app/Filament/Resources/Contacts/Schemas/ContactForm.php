@@ -7,10 +7,13 @@ use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\Textarea;
+use Filament\Forms\Components\DateTimePicker;
+use Filament\Forms\Get;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
+
 use Illuminate\Support\Str;
 class ContactForm
 {
@@ -18,65 +21,58 @@ class ContactForm
     {
         return $schema
             ->components([
-               Section::make('Détails du Message')
-                    ->schema([
-                        Select::make('type')
-                            ->label('Type de demande')
-                            ->options([
-                                'general' => 'Question Générale (Page Contact)',
-                                'service' => 'Demande adressée à un Service',
-                            ])
-                            ->required(),
+               Section::make('Demande reçue de l\'habitant')
+            ->schema([
+                TextInput::make('name')
+                    ->label('Nom du citoyen')
+                    ->disabled(),
 
-                        Select::make('service_id')
-                            ->label('Service concerné')
-                            ->relationship('service', 'name')
-                            ->placeholder('Aucun service spécifique')
-                            ->visible(fn ($get) => $get('type') === 'service'),
+                TextInput::make('email')
+                    ->label('Adresse e-mail')
+                    ->disabled(),
 
-                        TextInput::make('name')
-                            ->label('Nom complet')
-                            ->required(),
+                Select::make('service_id')
+                    ->relationship('service', 'name')
+                    ->label('Service concerné')
+                    ->disabled(),
 
-                        TextInput::make('email')
-                            ->label('Email')
-                            ->email()
-                            ->required(),
+                DateTimePicker::make('requested_at')
+                    ->label('Créneau souhaité par l’habitant')
+                    ->disabled(),
 
-                        TextInput::make('phone')
-                            ->label('Téléphone'),
+                Textarea::make('message')
+                    ->label('Motif / Message')
+                    ->disabled()
+                    ->columnSpanFull(),
+            ])->columns(2),
 
-                        TextInput::make('subject')
-                            ->label('Sujet')
-                            ->required()
-                            ->columnSpanFull(),
+        // 2. ACTION DE L'AGENT : Décision uniquement (Visible si type === 'service')
+        Section::make('Traitement du Rendez-vous')
+            ->visible(fn (callable $get): bool => $get('type') === 'service')
+            ->schema([
+                Select::make('status')
+                    ->label('Décision')
+                    ->options([
+                        'nouveau' => 'En attente',
+                        'traite'  => 'Accepter le rendez-vous',
+                        'archive' => 'Refuser le rendez-vous',
+                    ])
+                    ->required()
+                    ->live(),
 
-                        Textarea::make('message')
-                            ->label('Contenu du message')
-                            ->required()
-                            ->rows(5)
-                            ->columnSpanFull(),
-                    ])->columns(2),
+                // Si Accepté : choix/confirmation de l'horaire
+                DateTimePicker::make('confirmed_at')
+                    ->label('Fixer / Confirmer l\'horaire du RDV')
+                    ->required(fn (callable $get): bool => $get('status') === 'traite')
+                    ->visible(fn (callable $get): bool => $get('status') === 'traite'),
 
-                Section::make('Traitement Administratif')
-                    ->schema([
-                        Select::make('status')
-                            ->label('Statut du traitement')
-                            ->options([
-                                'nouveau' => 'Nouveau',
-                                'en_cours' => 'En cours de traitement',
-                                'traite' => 'Traité / Répondu',
-                                'archive' => 'Archivé',
-                            ])
-                            ->required()
-                            ->default('nouveau'),
-
-                        Textarea::make('admin_notes')
-                            ->label('Notes internes de l\'agent')
-                            ->placeholder('Ajoutez des précisions sur la réponse apportée...')
-                            ->rows(3)
-                            ->columnSpanFull(),
-                    ]),
+                // Si Refusé : saisie du motif
+               Textarea::make('rejection_reason')
+                    ->label('Motif du refus (expliqué au citoyen)')
+                    ->required(fn (callable $get): bool => $get('status') === 'archive')
+                    ->visible(fn (callable $get): bool => $get('status') === 'archive')
+                    ->columnSpanFull(),
+            ])->columns(2),
 
             ]);
     }
