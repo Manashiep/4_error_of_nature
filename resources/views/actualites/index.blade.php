@@ -21,14 +21,19 @@
 
     <ul class="grid gap-3">
         @forelse ($items as $a)
-            <li class="grid gap-1 rounded-2xl border border-edge bg-glass p-4 sm:grid-cols-[6rem_1fr] sm:gap-4 hc:border-2 hc:bg-black">
+            <li class="grid gap-3 rounded-2xl border border-edge bg-glass p-4 sm:grid-cols-[6rem_1fr] sm:gap-4 hc:border-2 hc:bg-black">
                 <time datetime="{{ $a->published_at->toDateString() }}" class="text-[.85rem] font-bold text-cyan">{{ $a->published_at->locale('fr')->translatedFormat('j M Y') }}</time>
-                <div>
-                    <span class="inline-block rounded-full border px-3 py-0.5 text-[.78rem] {{ $a->level === 'alerte' ? 'border-coral text-coral' : ($a->level === 'important' ? 'border-warn text-warn' : 'border-cyan/60 text-cyan') }}">
-                        {{ $a->level === 'alerte' ? 'Alerte' : ($a->level === 'important' ? 'Important' : $a->category) }}
-                    </span>
-                    <h3 class="mt-1 text-[1.15rem] font-bold"><a href="{{ route('annonces.show', $a->slug) }}" class="text-ink no-underline hover:text-cyan hover:underline hc:underline">{{ $a->title }}</a></h3>
-                    <p class="mt-1 text-mute">{{ $a->summary }}</p>
+                <div class="grid gap-3 md:grid-cols-[1fr_10rem]">
+                    <div>
+                        <span class="inline-block rounded-full border px-3 py-0.5 text-[.78rem] {{ $a->level === 'alerte' ? 'border-coral text-coral' : ($a->level === 'important' ? 'border-warn text-warn' : 'border-cyan/60 text-cyan') }}">
+                            {{ $a->category }}
+                        </span>
+                        <h3 class="mt-1 text-[1.15rem] font-bold"><a href="{{ route('annonces.show', $a->slug) }}" class="text-ink no-underline hover:text-cyan hover:underline hc:underline">{{ $a->title }}</a></h3>
+                        <p class="mt-1 text-mute">{{ $a->summary }}</p>
+                    </div>
+                    @if ($a->image_url)
+                        <img src="{{ $a->image_url }}" alt="" loading="lazy" class="h-28 w-full rounded-xl object-cover md:h-full">
+                    @endif
                 </div>
             </li>
         @empty

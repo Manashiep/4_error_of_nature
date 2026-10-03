@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Announcement;
+use App\Models\Annoncements;
 use App\Models\GlossaryTerm;
 use App\Models\Report;
 use App\Models\Service;
@@ -11,11 +11,6 @@ use Illuminate\Http\Request;
 /** Pages publiques (sans connexion) : tout vient de la base, rien en dur. */
 class PublicController extends Controller
 {
-    private function published()
-    {
-        return Announcement::query()->whereNotNull('published_at')->where('published_at', '<=', now());
-    }
-
     // D07 / D05 / D06 / F28
     public function home()
     {
@@ -27,11 +22,11 @@ class PublicController extends Controller
             'reports' => Report::withCount('supports')
                 ->whereNotIn('status', ['resolved', 'rejected'])
                 ->orderByDesc('supports_count')->latest()->take(3)->get(),
-            'annonces' => $this->published()->latest('published_at')->take(4)->get(),
+            'annonces' => Annoncements::published()->latest('published_at')->take(4)->get(),
             'stats' => [
                 'services' => Service::count(),
                 'actifs' => Service::where('is_active', true)->count(),
-                'annonces' => $this->published()->count(),
+                'annonces' => Annoncements::published()->count(),
             ],
         ]);
     }
@@ -77,26 +72,39 @@ class PublicController extends Controller
         ]);
     }
 
-    // D06
+    // D06 : liste des annonces
     public function announcements(Request $request)
     {
+        $categories = Annoncements::published()->distinct()->orderBy('category')->pluck('category');
         $cat = $request->query('categorie');
+        $cat = $categories->contains($cat) ? $cat : null;
 
         return view('actualites.index', [
-            'items' => $this->published()->when($cat, fn ($b) => $b->where('category', $cat))
-                ->latest('published_at')->simplePaginate(8)->withQueryString(),
-            'categories' => $this->published()->distinct()->orderBy('category')->pluck('category'),
+            'items' => Annoncements::published()
+                ->when($cat, fn ($b) => $b->where('category', $cat))
+                ->latest('published_at')
+                ->simplePaginate(8)
+                ->withQueryString(),
+            'categories' => $categories,
             'cat' => $cat,
         ]);
     }
 
-    public function announcement(Announcement $announcement)
+    // Détail d'une annonce
+    public function announcement(Annoncements $announcement)
     {
-        abort_unless($announcement->published_at && $announcement->published_at->isPast(), 404);
+        abort_unless(
+            $announcement->is_published && $announcement->published_at?->isPast(),
+            404
+        );
 
         return view('actualites.show', [
             'announcement' => $announcement,
-            'others' => $this->published()->whereKeyNot($announcement->id)->latest('published_at')->take(3)->get(),
+            'others' => Annoncements::published()
+                ->whereKeyNot($announcement->id)
+                ->latest('published_at')
+                ->take(3)
+                ->get(),
         ]);
     }
 
