@@ -30,7 +30,8 @@ class ServiceForm
                         TextInput::make('slug')
                             ->label('Identifiant URL (Slug)')
                             ->required()
-                            ->unique(Service::class, 'slug', ignoreRecord: true),
+                            ->unique(Service::class, 'slug', ignoreRecord: true)
+                            ->maxLength(255),
 
                         Select::make('category')
                             ->label('Catégorie')
