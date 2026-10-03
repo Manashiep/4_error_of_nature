@@ -7,6 +7,8 @@ use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
 use Filament\Actions\ViewAction;
 use Filament\Tables\Table;
+use Filament\Tables\Columns\TextColumn;
+use Filament\Tables\Filters\SelectFilter;
 
 class TerraRequestsTable
 {
@@ -14,7 +16,52 @@ class TerraRequestsTable
     {
         return $table
             ->columns([
-                //
+                TextColumn::make('request_code')
+                    ->label('Code')
+                    ->searchable()
+                    ->sortable(),
+
+                TextColumn::make('requester_name')
+                    ->label('Demandeur')
+                    ->searchable(),
+
+                TextColumn::make('message_public')
+                    ->label('Consigne')
+                    ->wrap() // Affiche tout le texte du message clairement
+                    ->searchable(),
+
+                TextColumn::make('difficulty')
+                    ->label('Difficulté')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'facile'    => 'success',
+                        'moyen'     => 'warning',
+                        'difficile' => 'danger',
+                        default     => 'gray',
+                    }),
+
+                TextColumn::make('xp_total')
+                    ->label('XP Total')
+                    ->numeric()
+                    ->sortable(),
+
+                TextColumn::make('wave_number')
+                    ->label('Vague')
+                    ->sortable(),
+
+                TextColumn::make('status')
+                    ->label('Statut')
+                    ->badge()
+                    ->color(fn (string $state): string => match ($state) {
+                        'pending'     => 'gray',
+                        'in_progress' => 'warning',
+                        'completed'   => 'success',
+                        default       => 'gray',
+                    }),
+            ])
+            ->filters([
+                SelectFilter::make('wave_number')
+                    ->label('Filtrer par Vague'),
             ])
             ->filters([
                 //
