@@ -10,15 +10,8 @@ use Illuminate\Support\Str;
 class Report extends Model
 {
     protected $fillable = [
-        'reference',
-        'user_id',
-        'service_id',
-        'title',
-        'category',
-        'description',
-        'location',
-        'image_path',
-        'status',
+        'reference', 'user_id', 'service_id', 'title', 'category',
+        'description', 'location', 'image_path', 'status',
     ];
 
     // Statut par défaut : en attente
@@ -30,6 +23,7 @@ class Report extends Model
         'resolved'    => 'Résolu',
         'rejected'    => 'Rejeté',
     ];
+
     public const CATEGORIES = [
         'Éclairage public',
         'Voirie et trottoirs',
@@ -40,14 +34,11 @@ class Report extends Model
         'Autre',
     ];
 
-    // ⚠ Garde ici ta constante CATEGORIES existante (le contrôleur l'utilise)
-    // public const CATEGORIES = [...];
-
     protected static function booted(): void
     {
         static::creating(function ($report) {
             if (empty($report->reference)) {
-                $report->reference = 'SIG-' . strtoupper(Str::random(6));
+                $report->reference = 'SIG-'.strtoupper(Str::random(6));
             }
         });
     }

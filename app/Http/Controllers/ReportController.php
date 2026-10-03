@@ -42,23 +42,10 @@ class ReportController extends Controller
         return redirect(route('signalement').'#confirmation')->with('sent', $reference);
     }
 
-    public function index(Request $request): View
+    // Liste publique : gérée par le composant Livewire ReportsList
+    public function index(): View
     {
-        $cat = $request->query('categorie');
-        if ($cat && ! in_array($cat, Report::CATEGORIES, true)) {
-            $cat = null;
-        }
-
-        return view('demandes.index', [
-            'items' => Report::withCount('supports')
-                ->when($cat, fn ($b) => $b->where('category', $cat))
-                ->orderByRaw("case when status in ('resolved','rejected') then 1 else 0 end")
-                ->orderByDesc('supports_count')
-                ->latest()
-                ->simplePaginate(9)->withQueryString(),
-            'cat'        => $cat,
-            'categories' => Report::CATEGORIES,
-        ]);
+        return view('demandes.index');
     }
 
     public function show(Request $request, Report $report): View
@@ -66,12 +53,12 @@ class ReportController extends Controller
         $user = $request->user();
 
         return view('demandes.show', [
-            'report'    => $report->loadCount('supports'),
-            'mine'      => $user && $report->user_id === $user->id,
-            'supported' => $user ? $report->supports()->where('user_id', $user->id)->exists() : false,
+            'report' => $report->loadCount('supports'),
+            'mine'   => $user && $report->user_id === $user->id,
         ]);
     }
 
+    // Repli sans JavaScript : soutenir via un formulaire classique
     public function support(Request $request, Report $report): RedirectResponse
     {
         $to = route('demandes.show', $report).'#soutien';

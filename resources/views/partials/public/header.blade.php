@@ -11,6 +11,7 @@
         <ul class="flex flex-wrap items-center gap-1">
             <li><a class="{{ $nav }}" href="{{ url('/') }}" @if (request()->is('/')) aria-current="page" @endif>Accueil</a></li>
             <li><a class="{{ $nav }}" href="{{ route('services.index') }}" @if (request()->is('services*')) aria-current="page" @endif>Services</a></li>
+            <li><a class="{{ $nav }}" href="{{ route('transport') }}" @if (request()->is('transport*')) aria-current="page" @endif>Transport</a></li>
             <li><a class="{{ $nav }}" href="{{ route('demandes.index') }}" @if (request()->is('demandes*')) aria-current="page" @endif>Demandes</a></li>
             <li><a class="{{ $nav }}" href="{{ route('annonces.index') }}" @if (request()->is('actualites*')) aria-current="page" @endif>Annonces</a></li>
             <li><a class="{{ $nav }}" href="{{ route('contact') }}" @if (request()->is('contact*')) aria-current="page" @endif>Contact</a></li>

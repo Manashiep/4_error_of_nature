@@ -24,7 +24,8 @@ class PublicController extends Controller
             'topViewed' => Service::orderByDesc('views_count')->take(3)->get(),
             'terms' => GlossaryTerm::orderBy('sort_order')->take(6)->get(),
             'langs' => Service::languages(),
-            'reports' => Report::withCount('supports')->where('status', '!=', 'traite')
+            'reports' => Report::withCount('supports')
+                ->whereNotIn('status', ['resolved', 'rejected'])
                 ->orderByDesc('supports_count')->latest()->take(3)->get(),
             'annonces' => $this->published()->latest('published_at')->take(4)->get(),
             'stats' => [
@@ -54,6 +55,14 @@ class PublicController extends Controller
             'categories' => Service::query()->distinct()->orderBy('category')->pluck('category'),
             'q' => $q,
             'cat' => $cat,
+        ]);
+    }
+
+    // Page Transport : les services de la catégorie « Transport »
+    public function transport()
+    {
+        return view('transport', [
+            'services' => Service::where('category', 'Transport')->ranked()->get(),
         ]);
     }
 

@@ -2,25 +2,17 @@
 
 namespace App\Filament\Resources\Services\Schemas;
 
-use Filament\Schemas\Schema;
-use Filament\Forms\Components\Select;
-use Filament\Schemas\Components\Section;
-use App\Filament\Resources\ServiceResource\Pages;
 use App\Models\Service;
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Support\Str;
-use Filament\Forms\Get;
-use Filament\Forms\Components;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Set;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\TextInput;
+use Filament\Forms\Components\Toggle;
+use Filament\Schemas\Components\Section;
+use Filament\Schemas\Schema;
+use Illuminate\Support\Str;
+
 class ServiceForm
 {
     public static function configure(Schema $schema): Schema
@@ -29,11 +21,11 @@ class ServiceForm
             ->components([
                 Section::make('Informations Générales')
                     ->schema([
-                       TextInput::make('name')
-    ->label('Nom du service')
-    ->required()
-    ->live(onBlur: true)
-    ->afterStateUpdated(fn ($set, $state) => $set('slug', Str::slug($state))),
+                        TextInput::make('name')
+                            ->label('Nom du service')
+                            ->required()
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(fn ($set, $state) => $set('slug', Str::slug($state))),
 
                         TextInput::make('slug')
                             ->label('Identifiant URL (Slug)')
@@ -45,6 +37,7 @@ class ServiceForm
                             ->options([
                                 'Général' => 'Général',
                                 'Voirie & Infrastructure' => 'Voirie & Infrastructure',
+                                'Transport' => 'Transport',
                                 'Santé & Social' => 'Santé & Social',
                                 'État Civil & Administratif' => 'État Civil & Administratif',
                                 'Environnement & Propreté' => 'Environnement & Propreté',
@@ -53,22 +46,23 @@ class ServiceForm
                             ->default('Général')
                             ->required(),
 
-                       Textarea::make('short_description')
+                        Textarea::make('short_description')
                             ->label('Aperçu court (Carte)')
                             ->rows(2)
                             ->maxLength(255),
 
-                      RichEditor::make('description')
+                        RichEditor::make('description')
                             ->label('Description complète du service')
                             ->required()
                             ->columnSpanFull(),
                     ])->columns(2),
 
-               Section::make('Médias & Contacts')
+                Section::make('Médias & Contacts')
                     ->schema([
                         FileUpload::make('image_path')
                             ->label('Illustration / Photo du service')
                             ->image()
+                            ->disk('public')
                             ->directory('services')
                             ->visibility('public'),
 
@@ -81,9 +75,9 @@ class ServiceForm
                             ->tel(),
                     ])->columns(3),
 
-               Section::make('Statut & Visibilité (Exigences API)')
+                Section::make('Statut & Visibilité (Exigences API)')
                     ->schema([
-                       Toggle::make('is_active')
+                        Toggle::make('is_active')
                             ->label('Service Actif')
                             ->helperText('Décocher pour passer en mode maintenance / panne (Req. F38)')
                             ->default(true),
@@ -93,7 +87,6 @@ class ServiceForm
                             ->helperText('Épingler en haut de la liste sur le portail citoyen (Req. F28)')
                             ->default(false),
                     ])->columns(2),
-
             ]);
     }
 }
