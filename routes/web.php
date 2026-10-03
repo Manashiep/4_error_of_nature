@@ -26,5 +26,7 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 });
+use App\Http\Controllers\ActualiteController;
+
 
 require __DIR__.'/settings.php';

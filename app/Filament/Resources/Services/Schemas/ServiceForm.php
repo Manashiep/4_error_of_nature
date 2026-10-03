@@ -14,13 +14,13 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Support\Str;
 use Filament\Forms\Get;
-use Filament\Forms\Components;
+use Filament\Forms\Set;
 use Filament\Forms\Components\Toggle;
 use Filament\Forms\Components\Textarea;
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Set;
 use Filament\Forms\Components\TextInput;
+
 class ServiceForm
 {
     public static function configure(Schema $schema): Schema
@@ -29,16 +29,22 @@ class ServiceForm
             ->components([
                 Section::make('Informations Générales')
                     ->schema([
-                       TextInput::make('name')
-    ->label('Nom du service')
-    ->required()
-    ->live(onBlur: true)
-    ->afterStateUpdated(fn ($set, $state) => $set('slug', Str::slug($state))),
+                        TextInput::make('name')
+                            ->label('Nom du service')
+                            ->required()
+                            ->live(onBlur: true)
+                            ->afterStateUpdated(function ($set, ?string $state) {
+                                if (blank($state)) {
+                                    return;
+                                }
+                                $set('slug', Str::slug($state));
+                            }),
 
                         TextInput::make('slug')
                             ->label('Identifiant URL (Slug)')
                             ->required()
-                            ->unique(Service::class, 'slug', ignoreRecord: true),
+                            ->unique(Service::class, 'slug', ignoreRecord: true)
+                            ->maxLength(255),
 
                         Select::make('category')
                             ->label('Catégorie')
@@ -53,18 +59,18 @@ class ServiceForm
                             ->default('Général')
                             ->required(),
 
-                       Textarea::make('short_description')
+                        Textarea::make('short_description')
                             ->label('Aperçu court (Carte)')
                             ->rows(2)
                             ->maxLength(255),
 
-                      RichEditor::make('description')
+                        RichEditor::make('description')
                             ->label('Description complète du service')
                             ->required()
                             ->columnSpanFull(),
                     ])->columns(2),
 
-               Section::make('Médias & Contacts')
+                Section::make('Médias & Contacts')
                     ->schema([
                         FileUpload::make('image_path')
                             ->label('Illustration / Photo du service')
@@ -81,9 +87,9 @@ class ServiceForm
                             ->tel(),
                     ])->columns(3),
 
-               Section::make('Statut & Visibilité (Exigences API)')
+                Section::make('Statut & Visibilité (Exigences API)')
                     ->schema([
-                       Toggle::make('is_active')
+                        Toggle::make('is_active')
                             ->label('Service Actif')
                             ->helperText('Décocher pour passer en mode maintenance / panne (Req. F38)')
                             ->default(true),
@@ -93,7 +99,6 @@ class ServiceForm
                             ->helperText('Épingler en haut de la liste sur le portail citoyen (Req. F28)')
                             ->default(false),
                     ])->columns(2),
-
             ]);
     }
 }
