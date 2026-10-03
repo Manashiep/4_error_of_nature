@@ -2,38 +2,67 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Support\Str;
+
 class Service extends Model
 {
-    use HasFactory;
-
-    protected $fillable = [
-        'name',
-        'slug',
-        'short_description',
-        'description',
-        'image_path',
-        'category',
-        'contact_email',
-        'contact_phone',
-        'views_count',
-        'is_active',
-        'is_featured',
-        'translations',
-    ];
+    protected $guarded = [];
 
     protected $casts = [
+        'translations' => 'array',
         'is_active' => 'boolean',
         'is_featured' => 'boolean',
-        'translations' => 'array',
+        'views_count' => 'integer',
     ];
 
-    /**
-     * Incrémente le compteur de clics du service
-     */
-    public function incrementViews(): void
+    /** F28 : prioritaires d'abord, puis les plus consultés */
+    public function scopeRanked(Builder $q): Builder
     {
-        $this->increment('views_count');
+        return $q->orderByDesc('is_featured')->orderByDesc('views_count')->orderBy('name');
+    }
+
+    /**
+     * D14 / F27 : texte traduit si une traduction existe pour la langue choisie, sinon le français.
+     * Format attendu en base : {"en": {"name": "...", "short_description": "...", "description": "..."}}
+     */
+    public function tr(string $field): ?string
+    {
+        $lang = session('lang');
+
+        if ($lang && $lang !== 'fr') {
+            $t = data_get($this->translations, $lang.'.'.$field);
+            if (filled($t)) {
+                return $t;
+            }
+        }
+
+        return $this->{$field};
+    }
+
+    /** Langues réellement présentes dans la base */
+    public static function languages(): array
+    {
+        return static::query()->whereNotNull('translations')->pluck('translations')
+            ->flatMap(fn ($t) => array_keys((array) $t))
+            ->reject(fn ($c) => $c === 'fr')->unique()->values()->all();
+    }
+
+    public static function languageLabel(string $code): string
+    {
+        return ['fr' => 'Français', 'en' => 'English', 'es' => 'Español', 'pt' => 'Português',
+                'de' => 'Deutsch', 'it' => 'Italiano', 'ar' => 'العربية'][$code] ?? strtoupper($code);
+    }
+
+    public function getImageUrlAttribute(): ?string
+    {
+        if (! $this->image_path) {
+            return null;
+        }
+
+        return Str::startsWith($this->image_path, ['http://', 'https://', '/'])
+            ? $this->image_path
+            : asset('storage/'.$this->image_path);
     }
 }

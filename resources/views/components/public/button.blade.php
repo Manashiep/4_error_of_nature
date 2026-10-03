@@ -1,9 +1,9 @@
 @props(['href' => null, 'variant' => 'primary'])
 @php
-    $base = 'inline-block cursor-pointer rounded-[.6rem] border-2 bg-transparent px-[1.4rem] py-[.7rem] font-hud text-[.9rem] font-bold tracking-[.05em] text-white no-underline transition-colors hc:bg-[#ffe600] hc:text-black hc:shadow-none hc:hover:bg-white';
+    $base = 'inline-flex cursor-pointer items-center justify-center gap-2 rounded-full px-6 py-3 font-bold no-underline transition hover:brightness-110 hc:border-2 hc:border-white hc:bg-[#ffe600] hc:bg-none hc:text-black hc:shadow-none';
     $look = $variant === 'alt'
-        ? 'border-cyan-neon shadow-[0_0_14px_rgba(56,232,255,.4),inset_0_0_14px_rgba(56,232,255,.15)] hover:bg-cyan-neon/15'
-        : 'border-pink-neon shadow-[0_0_18px_rgba(255,45,138,.5),inset_0_0_18px_rgba(255,45,138,.22)] hover:bg-pink-neon/20';
+        ? 'border border-edge bg-glass text-ink hover:bg-glass-hi'
+        : 'bg-linear-to-br from-cyan to-cyan/70 text-on-cyan shadow-[0_0_28px_var(--glow)]';
 @endphp
 @if ($href)
     <a href="{{ $href }}" {{ $attributes->class([$base, $look]) }}>{{ $slot }}</a>

@@ -2,55 +2,75 @@
 
 @source '../views';
 
-/* Variante hc: = mode contraste élevé (classe .hc sur <html>) */
+/* hc: = mode contraste élevé (classe .hc sur <html>) */
 @custom-variant hc (&:where(.hc, .hc *));
 
-@theme {
-    --font-hud: 'Orbitron', system-ui, sans-serif;
-    --font-sans: 'Rajdhani', system-ui, sans-serif;
-
-    --color-night: #050b1d;
-    --color-cyan-neon: #38e8ff;
-    --color-pink-neon: #ff2d8a;
-    --color-ink: #e8f1ff;
-    --color-mute: #9db3dd;
-    --color-ok: #2dff9a;
-    --color-err: #ff8aa3;
-    --color-line: rgba(120, 200, 255, 0.35);
+/* Palette Halo : tout passe par des variables, donc clair / sombre / contraste élevé suivent */
+:root {
+    --bg: #070b1a; --ink: #eef4ff; --mute: #b3bfdc;
+    --glass: rgba(255, 255, 255, .07); --glass-hi: rgba(255, 255, 255, .16); --edge: rgba(255, 255, 255, .22);
+    --shadow: rgba(0, 0, 0, .45); --glow: rgba(92, 242, 230, .45);
+    --cyan: #5cf2e6; --violet: #8b7bff; --coral: #ff8a6b; --on-cyan: #06101f;
+    --ok: #3dffa4; --warn: #ffc23d; --err: #ff8aa3;
+}
+@media (prefers-color-scheme: light) {
+    html:not(.hc) {
+        --bg: #e8eefc; --ink: #10183a; --mute: #44527a;
+        --glass: rgba(255, 255, 255, .45); --glass-hi: rgba(255, 255, 255, .8); --edge: rgba(255, 255, 255, .9);
+        --shadow: rgba(40, 60, 140, .25); --glow: rgba(0, 127, 120, .3);
+        --cyan: #00756f; --violet: #4f3fd0; --coral: #b93d12; --on-cyan: #fff;
+        --ok: #0a7a45; --warn: #8a5a00; --err: #b3263f;
+    }
+}
+html.hc {
+    --bg: #000; --ink: #fff; --mute: #fff; --glass: #000; --glass-hi: #000; --edge: #fff;
+    --cyan: #ffe600; --violet: #ffe600; --coral: #ffe600; --on-cyan: #000;
+    --ok: #fff; --warn: #fff; --err: #fff; --shadow: transparent; --glow: transparent;
 }
 
-/* Contraste élevé (F23) : on redéfinit les couleurs, tous les utilitaires suivent */
-html.hc {
-    --color-night: #000;
-    --color-ink: #fff;
-    --color-mute: #fff;
-    --color-cyan-neon: #ffe600;
-    --color-pink-neon: #ffe600;
-    --color-line: #fff;
-    --color-err: #fff;
+@theme inline {
+    --font-hud: 'Unbounded', system-ui, sans-serif;
+    --font-sans: 'Manrope', system-ui, sans-serif;
+    --color-night: var(--bg);
+    --color-ink: var(--ink);
+    --color-mute: var(--mute);
+    --color-glass: var(--glass);
+    --color-glass-hi: var(--glass-hi);
+    --color-edge: var(--edge);
+    --color-line: var(--edge);
+    --color-cyan: var(--cyan);
+    --color-violet: var(--violet);
+    --color-coral: var(--coral);
+    --color-on-cyan: var(--on-cyan);
+    --color-ok: var(--ok);
+    --color-warn: var(--warn);
+    --color-err: var(--err);
+    /* alias pour les anciennes pages (signalement, dashboard…) */
+    --color-cyan-neon: var(--cyan);
+    --color-pink-neon: var(--violet);
 }
 
 @layer base {
-    /* Taille du texte (F24) : tout est en rem, donc tout suit */
-    html {
-        font-size: calc(100% * var(--fs, 1));
-        scroll-behavior: smooth;
-    }
+    html { font-size: calc(100% * var(--fs, 1)); scroll-behavior: smooth; }
     body {
-        @apply bg-night font-sans text-[1.0625rem] font-medium leading-normal text-ink;
+        @apply bg-night font-sans text-ink antialiased;
         min-height: 100vh;
-        text-shadow: 0 1px 8px #050b1dcc;
+        overflow-x: hidden;
         padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
     }
-    html.hc body {
-        text-shadow: none;
-    }
     :where(a, button, input, textarea, select):focus-visible {
-        outline: 3px solid var(--color-cyan-neon);
-        outline-offset: 2px;
+        outline: 3px solid var(--cyan);
+        outline-offset: 3px;
     }
     @media (prefers-reduced-motion: reduce) {
         html { scroll-behavior: auto; }
-        * { transition: none !important; }
+        * { transition: none !important; animation: none !important; }
     }
 }
+
+/* Lumière derrière le verre */
+.orb { position: fixed; border-radius: 50%; filter: blur(70px); opacity: .7; z-index: 0; pointer-events: none; animation: drift 22s ease-in-out infinite alternate; }
+.orb-1 { width: 46vmax; height: 46vmax; background: #8b7bff; top: -12vmax; left: -10vmax; }
+.orb-2 { width: 38vmax; height: 38vmax; background: #5cf2e6; bottom: -14vmax; right: -8vmax; animation-delay: -8s; }
+.orb-3 { width: 22vmax; height: 22vmax; background: #ff8a6b; top: 38%; left: 46%; opacity: .45; animation-delay: -14s; }
+@keyframes drift { to { transform: translate(8vmax, 5vmax) scale(1.15); } }

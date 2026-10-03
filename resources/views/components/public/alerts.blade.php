@@ -1,21 +1,23 @@
-{{-- D18 / F29 / F31 : bandeau visible sur toutes les pages publiques, avec "Que faire" --}}
+{{-- D18 / F29 / F30 / F31 : bandeau sur toutes les pages publiques, avec "Que faire" --}}
 @props(['alerts' => collect()])
 @foreach ($alerts as $a)
-    @php $isAlert = $a->level === 'alerte'; @endphp
+    @php
+        $isAlert = $a->level === 'alerte';
+        $tone = $isAlert ? 'border-coral bg-coral/20' : ($a->level === 'important' ? 'border-warn bg-warn/15' : 'border-cyan bg-cyan/10');
+    @endphp
     <section role="{{ $isAlert ? 'alert' : 'status' }}" aria-labelledby="al-{{ $a->id }}"
-             class="my-3 rounded-2xl border-2 p-4 {{ $isAlert ? 'border-[#ff6b8a] bg-[rgba(90,10,35,.78)]' : 'border-[#ffc23d] bg-[rgba(80,55,0,.72)]' }} hc:border-white hc:bg-black">
+             class="my-3 rounded-[28px] border-2 p-4 backdrop-blur-[26px] {{ $tone }} hc:border-white hc:bg-black">
         <div class="flex flex-wrap items-start gap-3">
-            <span aria-hidden="true" class="text-2xl leading-none">{{ $isAlert ? '🚨' : '⚠️' }}</span>
             <div class="min-w-0 flex-1">
-                <h2 id="al-{{ $a->id }}" class="font-hud text-base font-bold tracking-[.04em]">
-                    <span class="sr-only">{{ $isAlert ? 'Alerte : ' : 'Information importante : ' }}</span>{{ $a->title }}
+                <h2 id="al-{{ $a->id }}" class="font-hud text-[.95rem] font-medium">
+                    <span class="font-bold">{{ $isAlert ? 'Alerte' : ($a->level === 'important' ? 'Important' : 'Information') }} ·</span> {{ $a->title }}
                 </h2>
                 <p class="mt-1">{{ $a->summary }}</p>
                 @if ($a->action)
                     <p class="mt-2 font-bold">Que faire : <span class="font-medium">{{ $a->action }}</span></p>
                 @endif
             </div>
-            <a href="{{ route('annonces.show', $a) }}" class="rounded-lg border border-white/60 px-3 py-1 text-white no-underline hover:bg-white/10 hc:border-2 hc:underline">Voir le détail</a>
+            <a href="{{ route('annonces.show', $a->slug) }}" class="rounded-full border border-ink/50 px-4 py-2 font-medium text-ink no-underline hover:bg-ink/10 hc:border-2 hc:underline">Voir le détail<span class="sr-only"> : {{ $a->title }}</span></a>
         </div>
     </section>
 @endforeach

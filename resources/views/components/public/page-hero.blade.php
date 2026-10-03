@@ -1,7 +1,7 @@
 @props(['title', 'lead' => null])
-<x-public.panel class="my-4 px-6 py-8" aria-labelledby="titre">
-    <h1 id="titre" class="font-hud text-[clamp(1.4rem,4vw,2.25rem)] font-black leading-[1.15] tracking-[.04em]">{{ $title }}</h1>
+<x-public.panel class="my-4 px-7 py-9" aria-labelledby="titre">
+    <h1 id="titre" class="font-hud text-[clamp(1.6rem,4.5vw,2.8rem)] font-light leading-[1.1] tracking-tight">{{ $title }}</h1>
     @if ($lead)
-        <p class="mt-3 max-w-[40rem] text-[1.15rem] text-mute">{{ $lead }}</p>
+        <p class="mt-4 max-w-[42rem] text-[1.1rem] text-mute">{{ $lead }}</p>
     @endif
 </x-public.panel>
