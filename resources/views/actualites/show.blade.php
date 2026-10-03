@@ -14,14 +14,12 @@
         @endif
     </p>
     <h1 id="titre" class="mt-3 font-hud text-[clamp(1.5rem,4vw,2.4rem)] font-light leading-[1.1] tracking-tight">{{ $announcement->title }}</h1>
-    <p class="mt-4 text-[1.15rem] text-mute">{{ $announcement->summary }}</p>
 
-    @if ($announcement->action)
-        <div class="mt-5 rounded-2xl border-2 border-warn bg-warn/15 p-4 hc:border-white hc:bg-black">
-            <h2 class="font-hud text-[.95rem] font-medium">Que faire</h2>
-            <p class="mt-1">{{ $announcement->action }}</p>
-        </div>
+    @if ($announcement->image_url)
+        <img src="{{ $announcement->image_url }}" alt="{{ $announcement->title }}" class="mt-5 max-h-[24rem] w-full rounded-2xl object-cover">
     @endif
+
+    <p class="mt-4 text-[1.15rem] text-mute">{{ $announcement->summary }}</p>
 
     <div class="mt-6 grid max-w-[46rem] gap-4 text-[1.05rem] leading-relaxed">
         @foreach (preg_split("/\n{2,}/", trim((string) $announcement->body)) as $para)
