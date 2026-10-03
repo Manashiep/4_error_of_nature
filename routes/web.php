@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Route;
 Route::controller(PublicController::class)->group(function () {
     Route::get('/', 'home')->name('home');
     Route::get('/services', 'services')->name('services.index');
-    // Route::get('/transport', 'transport')->name('transport');
+    Route::get('/transport', 'transport')->name('transport');
     Route::get('/services/{service:slug}', 'service')->name('services.show');
     Route::get('/actualites', 'announcements')->name('annonces.index');
     Route::get('/actualites/{announcement:slug}', 'announcement')->name('annonces.show');

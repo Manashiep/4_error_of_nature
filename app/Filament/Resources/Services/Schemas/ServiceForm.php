@@ -3,21 +3,6 @@
 namespace App\Filament\Resources\Services\Schemas;
 
 use App\Models\Service;
-<<<<<<< HEAD
-use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
-use Filament\Tables;
-use Filament\Tables\Table;
-use Illuminate\Support\Str;
-use Filament\Forms\Get;
-use Filament\Forms\Set;
-use Filament\Forms\Components\Toggle;
-use Filament\Forms\Components\Textarea;
-use Filament\Forms\Components\FileUpload;
-use Filament\Forms\Components\RichEditor;
-use Filament\Forms\Components\TextInput;
-=======
 use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\RichEditor;
 use Filament\Forms\Components\Select;
@@ -27,7 +12,6 @@ use Filament\Forms\Components\Toggle;
 use Filament\Schemas\Components\Section;
 use Filament\Schemas\Schema;
 use Illuminate\Support\Str;
->>>>>>> 43fa5090cfc0c24541c11bd82c9e3754a1c73ecd
 
 class ServiceForm
 {
@@ -41,16 +25,7 @@ class ServiceForm
                             ->label('Nom du service')
                             ->required()
                             ->live(onBlur: true)
-<<<<<<< HEAD
-                            ->afterStateUpdated(function ($set, ?string $state) {
-                                if (blank($state)) {
-                                    return;
-                                }
-                                $set('slug', Str::slug($state));
-                            }),
-=======
                             ->afterStateUpdated(fn ($set, $state) => $set('slug', Str::slug($state))),
->>>>>>> 43fa5090cfc0c24541c11bd82c9e3754a1c73ecd
 
                         TextInput::make('slug')
                             ->label('Identifiant URL (Slug)')
