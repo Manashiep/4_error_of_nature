@@ -33,11 +33,11 @@ class TerraRequestsTable
                 TextColumn::make('difficulty')
                     ->label('Difficulté')
                     ->badge()
-                    ->color(fn (string $state): string => match ($state) {
+                    ->color(fn (?string $state): string => match (mb_strtolower((string) $state)) {
                         'facile'    => 'success',
-                        'moyen'     => 'warning',
+                        'moyenne'     => 'warning',
                         'difficile' => 'danger',
-                        default     => 'gray',
+
                     }),
 
                 TextColumn::make('xp_total')
@@ -53,9 +53,9 @@ class TerraRequestsTable
                     ->label('Statut')
                     ->badge()
                     ->color(fn (string $state): string => match ($state) {
-                        'pending'     => 'gray',
-                        'in_progress' => 'warning',
-                        'completed'   => 'success',
+                        'En attente'     => 'gray',
+                        'En cours' => 'warning',
+                        'Terminé'   => 'success',
                         default       => 'gray',
                     }),
             ])
