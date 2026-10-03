@@ -1,7 +1,3 @@
-@php
-    // Bandeau d'alerte (D18 / F29 / F30 / F31) : scope Announcement::banner() (alertes d'abord)
-    $alerts ??= \App\Models\Announcement::banner()->take(3)->get();
-@endphp
 <!DOCTYPE html>
 <html lang="{{ session('lang', 'fr') }}">
 <head>
@@ -24,7 +20,6 @@
     <div class="relative z-10 mx-auto max-w-[1120px] px-4 pb-16 pt-2 sm:px-6">
         @include('partials.public.a11y-bar')
         @include('partials.public.header')
-        <x-public.alerts :alerts="$alerts" />
         <main id="contenu" tabindex="-1" class="focus:outline-none">
             @yield('content')
         </main>

@@ -11,7 +11,11 @@ class Report extends Model
 {
     protected $fillable = [
         'reference', 'user_id', 'service_id', 'title', 'category',
-        'description', 'location', 'image_path', 'status',
+        'description', 'location', 'image_path', 'status', 'is_urgent',
+    ];
+
+    protected $casts = [
+        'is_urgent' => 'boolean',
     ];
 
     // Statut par défaut : en attente

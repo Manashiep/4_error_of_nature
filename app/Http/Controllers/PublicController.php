@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Alert;
 use App\Models\Annoncements;
 use App\Models\GlossaryTerm;
 use App\Models\Report;
@@ -16,12 +17,14 @@ class PublicController extends Controller
     public function home()
     {
         return view('home', [
+            'alerts' => Alert::current()->urgentFirst()->take(5)->get(),
             'services' => Service::ranked()->take(6)->get(),
             'topViewed' => Service::orderByDesc('views_count')->take(3)->get(),
             'terms' => GlossaryTerm::orderBy('sort_order')->take(6)->get(),
             'langs' => Service::languages(),
             'reports' => Report::withCount('supports')
                 ->whereNotIn('status', ['resolved', 'rejected'])
+                ->orderByDesc('is_urgent')
                 ->orderByDesc('supports_count')->latest()->take(3)->get(),
             'annonces' => Annoncements::published()->latest('published_at')->take(4)->get(),
             'stats' => [

@@ -3,6 +3,9 @@
 @section('content')
 @php $latest = $annonces->first(); @endphp
 
+{{-- Alertes de la ville : dynamiques, créées par les agents ou l'admin --}}
+<x-public.alerts :alerts="$alerts" />
+
 {{-- D07 : où suis-je, que puis-je faire --}}
 <section class="grid items-center gap-10 py-12 lg:grid-cols-[1.05fr_1fr]" aria-labelledby="titre">
     <div>
@@ -18,11 +21,6 @@
         </form>
 
         <div class="flex flex-wrap gap-3">
-            {{-- NOUVEAU : bouton rouge de signalement --}}
-            <a href="{{ route('signalement') }}"
-               class="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-3 font-bold text-white no-underline shadow-lg shadow-red-600/30 transition hover:-translate-y-0.5 hover:bg-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white hc:border-2 hc:border-white hc:bg-black">
-                <span aria-hidden="true">⚠</span> Signaler un problème
-            </a>
             <x-public.button variant="alt" :href="route('services.index')">Voir les services</x-public.button>
             @guest
                 <x-public.button variant="alt" :href="route('register')">Créer mon compte</x-public.button>
@@ -225,4 +223,11 @@
         </dl>
     </x-public.panel>
 @endif
+
+{{-- Bouton fixe : signaler un problème urgent (reste visible pendant le défilement) --}}
+<a href="{{ route('signalement', ['urgent' => 1]) }}"
+   class="fixed z-50 inline-flex items-center gap-3 rounded-full bg-red-600 px-8 py-5 text-lg font-bold text-white no-underline shadow-2xl shadow-red-600/40 transition hover:-translate-y-1 hover:bg-red-700 focus-visible:outline-4 focus-visible:outline-offset-4 focus-visible:outline-white hc:border-2 hc:border-white hc:bg-black"
+   style="bottom: max(1.5rem, env(safe-area-inset-bottom)); right: max(1.5rem, env(safe-area-inset-right));">
+    <span aria-hidden="true" class="text-2xl">⚠</span> Signaler un problème urgent
+</a>
 @endsection

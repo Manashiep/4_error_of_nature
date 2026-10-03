@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AlertController;
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PublicController;
@@ -19,6 +20,11 @@ Route::controller(PublicController::class)->group(function () {
     Route::get('/langue/{code}', 'lang')->name('lang');
 });
 Route::post('/contact', [ContactController::class, 'store'])->middleware('throttle:6,1')->name('contact.store');
+
+// Alertes en direct (JSON) pour l'accueil
+Route::get('/alertes/actives', [AlertController::class, 'active'])
+    ->middleware('throttle:60,1')
+    ->name('alerts.active');
 
 // Demandes des habitants : consultation publique
 Route::get('/demandes', [ReportController::class, 'index'])->name('demandes.index');

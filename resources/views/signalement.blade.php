@@ -29,6 +29,14 @@
         </x-public.field>
         <x-public.field name="description" label="Que s'est-il passé ?" type="textarea" required help="Ex. : le lampadaire est éteint depuis trois jours, la rue est très sombre." />
         <x-public.field name="location" label="Où ?" required autocomplete="street-address" help="Adresse, rue ou repère proche (ex. : rue des Jardins, devant l'école)." />
+
+        @php $urgent = $errors->any() ? (bool) old('is_urgent') : request()->boolean('urgent'); @endphp
+        <label class="mt-4 flex items-start gap-3 rounded-xl border-2 border-red-500/70 p-3 hc:border-white">
+            <input type="checkbox" name="is_urgent" value="1" class="mt-1 size-5 accent-red-600" @checked($urgent)>
+            <span><b>Ce problème est urgent</b><br>
+                <span class="text-mute">Danger, fuite importante, risque pour les habitants : il sera traité en priorité.</span></span>
+        </label>
+
         <x-public.button class="mt-4 w-full text-center">Envoyer le signalement</x-public.button>
     </form>
 </x-public.panel>

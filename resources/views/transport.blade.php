@@ -21,9 +21,32 @@
     </div>
 @endif
 
-{{-- Lignes et horaires (données de Filament) --}}
-<x-public.panel class="my-6 p-6" aria-labelledby="h-li">
-    <h2 id="h-li" class="mb-5 font-hud text-[1.1rem] font-medium">Les lignes et horaires</h2>
+{{-- Annonces liées aux transports --}}
+@if ($alerts->isNotEmpty())
+    <x-public.panel class="my-6 p-6" aria-labelledby="h-al">
+        <h2 id="h-al" class="mb-4 flex flex-wrap items-baseline justify-between gap-4 font-hud text-[1.1rem] font-medium">
+            Travaux et alertes
+            <a href="{{ route('annonces.index') }}" class="font-sans text-[.95rem] font-medium text-cyan hover:underline hc:underline">Toutes les annonces →</a>
+        </h2>
+        <ul class="grid gap-3 md:grid-cols-3">
+            @foreach ($alerts as $a)
+                <li class="rounded-2xl border border-edge bg-glass p-4 hc:border-2 hc:bg-black">
+                    <time datetime="{{ $a->published_at->toDateString() }}" class="text-[.85rem] font-bold text-cyan">{{ $a->published_at->locale('fr')->translatedFormat('j M Y') }}</time>
+                    <span class="ml-2 inline-block rounded-full border px-2.5 py-0.5 text-[.75rem] {{ $a->level === 'alerte' ? 'border-coral text-coral' : 'border-warn text-warn' }}">{{ $a->category }}</span>
+                    <h3 class="mt-1 font-bold"><a href="{{ route('annonces.show', $a->slug) }}" class="text-ink no-underline hover:text-cyan hover:underline hc:underline">{{ $a->title }}</a></h3>
+                    <p class="mt-1 line-clamp-2 text-[.95rem] text-mute">{{ $a->summary }}</p>
+                </li>
+            @endforeach
+        </ul>
+    </x-public.panel>
+@endif
+
+{{-- Services de transport --}}
+<x-public.panel class="my-6 p-6" aria-labelledby="h-tr">
+    <h2 id="h-tr" class="mb-5 flex flex-wrap items-baseline justify-between gap-4 font-hud text-[1.1rem] font-medium">
+        Les services de transport
+        <a href="{{ route('services.index', ['cat' => 'Transport']) }}" class="font-sans text-[.95rem] font-medium text-cyan hover:underline hc:underline">Voir dans la liste des services →</a>
+    </h2>
 
     @php $chip = 'block rounded-full border border-edge px-4 py-1.5 text-ink no-underline hover:bg-glass-hi aria-[current=true]:border-cyan aria-[current=true]:bg-cyan/15 hc:border-2 hc:aria-[current=true]:bg-[#ffe600] hc:aria-[current=true]:text-black'; @endphp
     @if ($types->count() > 1)
@@ -88,46 +111,16 @@
             @endforeach
         </ul>
     @endif
-</x-public.panel>
 
-{{-- Annonces liées aux transports --}}
-@if ($alerts->isNotEmpty())
-    <x-public.panel class="my-6 p-6" aria-labelledby="h-al">
-        <h2 id="h-al" class="mb-4 flex flex-wrap items-baseline justify-between gap-4 font-hud text-[1.1rem] font-medium">
-            Travaux et alertes
-            <a href="{{ route('annonces.index') }}" class="font-sans text-[.95rem] font-medium text-cyan hover:underline hc:underline">Toutes les annonces →</a>
-        </h2>
-        <ul class="grid gap-3 md:grid-cols-3">
-            @foreach ($alerts as $a)
-                <li class="rounded-2xl border border-edge bg-glass p-4 hc:border-2 hc:bg-black">
-                    <time datetime="{{ $a->published_at->toDateString() }}" class="text-[.85rem] font-bold text-cyan">{{ $a->published_at->locale('fr')->translatedFormat('j M Y') }}</time>
-                    <span class="ml-2 inline-block rounded-full border px-2.5 py-0.5 text-[.75rem] {{ $a->level === 'alerte' ? 'border-coral text-coral' : 'border-warn text-warn' }}">{{ $a->category }}</span>
-                    <h3 class="mt-1 font-bold"><a href="{{ route('annonces.show', $a->slug) }}" class="text-ink no-underline hover:text-cyan hover:underline hc:underline">{{ $a->title }}</a></h3>
-                    <p class="mt-1 line-clamp-2 text-[.95rem] text-mute">{{ $a->summary }}</p>
-                </li>
-            @endforeach
-        </ul>
-    </x-public.panel>
-@endif
-
-{{-- Services de transport --}}
-<x-public.panel class="my-6 p-6" aria-labelledby="h-tr">
-    <h2 id="h-tr" class="mb-5 flex flex-wrap items-baseline justify-between gap-4 font-hud text-[1.1rem] font-medium">
-        Les services de transport
-        <a href="{{ route('services.index', ['cat' => 'Transport']) }}" class="font-sans text-[.95rem] font-medium text-cyan hover:underline hc:underline">Voir dans la liste des services →</a>
-    </h2>
-
-    @if ($services->isEmpty())
-        <p class="rounded-2xl border border-dashed border-edge p-8 text-center text-mute">
-            Aucun service de transport n'est publié pour le moment.
-            <a href="{{ route('contact') }}" class="text-cyan underline">Nous écrire</a>
-        </p>
-    @else
-        <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-            @foreach ($services as $s)
-                <x-public.service-card :service="$s" />
-            @endforeach
-        </ul>
+    @if ($services->isNotEmpty())
+        <div class="mt-8 border-t border-edge pt-6">
+            <h3 class="mb-4 font-hud text-[1rem] font-medium">Autres services liés au transport</h3>
+            <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                @foreach ($services as $s)
+                    <x-public.service-card :service="$s" />
+                @endforeach
+            </ul>
+        </div>
     @endif
 </x-public.panel>
 

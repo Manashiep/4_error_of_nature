@@ -37,6 +37,7 @@ class ReportController extends Controller
             'user_id'   => $request->user()->id,
             'title'     => $data['category'].' : '.Str::limit($data['location'], 60),
             'status'    => 'pending',
+            'is_urgent' => $request->boolean('is_urgent'),
         ]);
 
         return redirect(route('signalement').'#confirmation')->with('sent', $reference);

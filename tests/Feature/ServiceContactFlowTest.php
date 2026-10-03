@@ -52,7 +52,7 @@ test('a service-specific contact message is saved in the contact table with the 
     ]);
 
     $response->assertRedirect(route('services.show', $service) . '#contact-service');
-    $this->assertDatabaseHas('create_contacts_tables', [
+    $this->assertDatabaseHas('contacts', [
         'name' => 'Alice',
         'email' => 'alice@example.com',
         'type' => 'service',
