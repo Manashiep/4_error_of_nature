@@ -3,17 +3,40 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Str;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-/** Signalement d'un habitant (F25). Statuts : nouveau, en_cours, traite. */
 class Report extends Model
 {
-    protected $guarded = [];
+    protected $fillable = [
+        'reference',
+        'user_id',
+        'service_id',
+        'title',
+        'category',
+        'description',
+        'location',
+        'image_path',
+        'status',
+    ];
 
-    public const CATEGORIES = ['Éclairage public', 'Voirie', 'Eau et fuites', 'Déchets et propreté', 'Autre'];
+    protected static function booted(): void
+    {
+        static::creating(function ($report) {
+            if (empty($report->reference)) {
+                // Génère une référence unique du type : SIG-7K9A2P
+                $report->reference = 'SIG-' . strtoupper(Str::random(6));
+            }
+        });
+    }
 
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    public function service(): BelongsTo
+    {
+        return $this->belongsTo(Service::class);
     }
 }
