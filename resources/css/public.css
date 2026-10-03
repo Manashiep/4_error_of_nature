@@ -1,0 +1,56 @@
+@import 'tailwindcss';
+
+@source '../views';
+
+/* Variante hc: = mode contraste élevé (classe .hc sur <html>) */
+@custom-variant hc (&:where(.hc, .hc *));
+
+@theme {
+    --font-hud: 'Orbitron', system-ui, sans-serif;
+    --font-sans: 'Rajdhani', system-ui, sans-serif;
+
+    --color-night: #050b1d;
+    --color-cyan-neon: #38e8ff;
+    --color-pink-neon: #ff2d8a;
+    --color-ink: #e8f1ff;
+    --color-mute: #9db3dd;
+    --color-ok: #2dff9a;
+    --color-err: #ff8aa3;
+    --color-line: rgba(120, 200, 255, 0.35);
+}
+
+/* Contraste élevé (F23) : on redéfinit les couleurs, tous les utilitaires suivent */
+html.hc {
+    --color-night: #000;
+    --color-ink: #fff;
+    --color-mute: #fff;
+    --color-cyan-neon: #ffe600;
+    --color-pink-neon: #ffe600;
+    --color-line: #fff;
+    --color-err: #fff;
+}
+
+@layer base {
+    /* Taille du texte (F24) : tout est en rem, donc tout suit */
+    html {
+        font-size: calc(100% * var(--fs, 1));
+        scroll-behavior: smooth;
+    }
+    body {
+        @apply bg-night font-sans text-[1.0625rem] font-medium leading-normal text-ink;
+        min-height: 100vh;
+        text-shadow: 0 1px 8px #050b1dcc;
+        padding: env(safe-area-inset-top, 0) 0 env(safe-area-inset-bottom, 0);
+    }
+    html.hc body {
+        text-shadow: none;
+    }
+    :where(a, button, input, textarea, select):focus-visible {
+        outline: 3px solid var(--color-cyan-neon);
+        outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        * { transition: none !important; }
+    }
+}
