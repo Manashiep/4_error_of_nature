@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
-
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Contact extends Model
 {
-    protected $table = 'create_contacts_tables';
+    use HasFactory;
 
     protected $fillable = [
         'type',
@@ -17,8 +17,16 @@ class Contact extends Model
         'phone',
         'subject',
         'message',
+        'requested_at',
+        'confirmed_at',
+        'rejection_reason',
         'status',
         'admin_notes',
+    ];
+
+    protected $casts = [
+        'requested_at' => 'datetime',
+        'confirmed_at' => 'datetime',
     ];
 
     public function service(): BelongsTo
