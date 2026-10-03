@@ -61,7 +61,22 @@
             @endif
             <li><b class="block text-cyan">Consultations</b>{{ $service->views_count }} fois</li>
         </ul>
-        <x-public.button class="mt-5 w-full" :href="route('contact', ['service' => $service->slug])">Envoyer un message</x-public.button>
+
+        @if (session('contact_sent'))
+            <div id="contact-service" role="status" class="mt-5 rounded-2xl border-2 border-ok bg-ok/10 p-4 hc:border-white hc:bg-black">
+                <p class="font-bold text-ok">✔ Message envoyé.</p>
+                <p>Votre demande a bien été transmise au service {{ $service->tr('name') }}.</p>
+            </div>
+        @endif
+
+        <form method="POST" action="{{ route('contact.store') }}" novalidate class="mt-5 grid gap-4" id="contact-service-form">
+            @csrf
+            <input type="hidden" name="service" value="{{ $service->slug }}">
+            <x-public.field name="name" label="Nom" required autocomplete="name" :value="auth()->user()?->name" />
+            <x-public.field name="email" label="Adresse e-mail" type="email" required autocomplete="email" :value="auth()->user()?->email" />
+            <x-public.field name="message" label="Votre message" type="textarea" required help="Décrivez précisément votre demande ou votre difficulté." />
+            <x-public.button class="w-full">Envoyer un message</x-public.button>
+        </form>
     </x-public.panel>
 </div>
 
