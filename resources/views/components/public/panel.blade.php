@@ -1,9 +1,8 @@
 @props(['as' => 'section'])
 <{{ $as }} {{ $attributes->class([
-    'relative rounded-2xl border border-line bg-[rgba(8,16,48,.14)] backdrop-blur-[5px] backdrop-saturate-[1.3]',
-    'shadow-[0_0_24px_rgba(56,232,255,.18),inset_0_0_40px_rgba(255,255,255,.04)]',
-    "after:absolute after:-top-px after:left-[1.1rem] after:h-0.5 after:w-[4.4rem] after:bg-cyan-neon after:shadow-[0_0_10px_var(--color-cyan-neon)] after:content-['']",
-    'hc:border-2 hc:border-white hc:bg-black hc:shadow-none hc:backdrop-blur-none hc:after:hidden',
+    'relative rounded-[28px] border border-edge bg-linear-to-br from-glass-hi via-glass via-40% to-glass backdrop-blur-[26px] backdrop-saturate-[1.7]',
+    'shadow-[0_30px_60px_-20px_var(--shadow),inset_0_1px_0_rgba(255,255,255,.35)]',
+    'hc:border-2 hc:border-white hc:bg-black hc:bg-none hc:shadow-none hc:backdrop-blur-none',
 ]) }}>
     {{ $slot }}
 </{{ $as }}>

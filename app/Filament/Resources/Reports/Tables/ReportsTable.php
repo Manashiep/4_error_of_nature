@@ -2,19 +2,17 @@
 
 namespace App\Filament\Resources\Reports\Tables;
 
-
-use Filament\Tables\Columns\ImageColumn;
+use App\Models\Report;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Actions\DeleteAction;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\SelectColumn;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
+
 class ReportsTable
 {
     public static function configure(Table $table): Table
@@ -43,12 +41,7 @@ class ReportsTable
 
                 SelectColumn::make('status')
                     ->label('Statut')
-                    ->options([
-                        'pending' => 'En attente',
-                        'in_progress' => 'En cours',
-                        'resolved' => 'Résolu',
-                        'rejected' => 'Rejeté',
-                    ]),
+                    ->options(Report::STATUSES),
 
                 ImageColumn::make('image_path')
                     ->label('Photo')
@@ -62,23 +55,11 @@ class ReportsTable
             ->filters([
                 SelectFilter::make('status')
                     ->label('Filtrer par statut')
-                    ->options([
-                        'pending' => 'En attente',
-                        'in_progress' => 'En cours',
-                        'resolved' => 'Résolu',
-                        'rejected' => 'Rejeté',
-                    ]),
-            ])
-            ->actions([
-                EditAction::make(),
-                DeleteAction::make(),
-
-            ])
-            ->filters([
-                //
+                    ->options(Report::STATUSES),
             ])
             ->recordActions([
                 EditAction::make(),
+                DeleteAction::make(),
             ])
             ->toolbarActions([
                 BulkActionGroup::make([

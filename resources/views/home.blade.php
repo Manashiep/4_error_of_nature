@@ -1,98 +1,228 @@
 @extends('layouts.public', ['title' => 'Accueil'])
 
 @section('content')
+@php $latest = $annonces->first(); @endphp
+
 {{-- D07 : où suis-je, que puis-je faire --}}
-<x-public.panel class="my-4 px-6 py-9" aria-labelledby="titre">
-    <span class="mb-[.9rem] inline-block rounded-full border border-line px-[.8rem] py-[.2rem] text-[.9rem] text-cyan-neon">
-        Portail officiel de la ville de Nova Terra
-    </span>
-    <h1 id="titre" class="max-w-[44rem] font-hud text-[clamp(1.5rem,5vw,2.75rem)] font-black leading-[1.1] tracking-[.04em]">
-        Tous les services de Nova Terra, au même endroit
-    </h1>
-    <p class="my-[.9rem] mb-5 max-w-[40rem] text-[1.25rem]">
-        Signalez un problème, trouvez le bon service, lisez les annonces de la ville ou écrivez à la mairie, sans vous déplacer.
-    </p>
+<section class="grid items-center gap-10 py-12 lg:grid-cols-[1.05fr_1fr]" aria-labelledby="titre">
+    <div>
+        <p class="mb-4 inline-block rounded-full border border-edge bg-glass px-4 py-1 text-[.9rem] text-cyan">Bienvenue à Nova Terra</p>
+        <h1 id="titre" class="font-hud text-[clamp(2.1rem,5.2vw,3.8rem)] font-light leading-[1.08] tracking-tight">Bonjour, vous êtes sur le portail officiel de Nova Terra.</h1>
+        <p class="mb-8 mt-5 max-w-[46ch] text-[1.1rem] text-mute">Ici, vous trouvez les services de la ville, vous signalez un problème dans votre rue, vous lisez les annonces et vous écrivez à la mairie, sans vous déplacer.</p>
 
-    {{-- F32 : retrouver rapidement un service --}}
-    <form role="search" action="{{ url('/services') }}" method="get" class="mb-4 flex flex-wrap gap-[.6rem]">
-        <label for="home-q" class="sr-only">Rechercher un service</label>
-        <input id="home-q" type="search" name="q" autocomplete="off"
-               placeholder="Rechercher un service : santé, éclairage, état civil…"
-               class="min-w-[12rem] flex-1 rounded-[.55rem] border border-[rgba(120,200,255,.45)] bg-white/5 px-3 py-[.6rem] text-ink placeholder:text-[#7f97c4] hc:border-2 hc:border-white hc:bg-black">
-        <x-public.button>Rechercher</x-public.button>
-    </form>
+        <form role="search" action="{{ route('services.index') }}" method="get" class="mb-5 flex flex-wrap gap-3">
+            <label for="home-q" class="sr-only">Rechercher un service</label>
+            <input id="home-q" type="search" name="q" autocomplete="off" placeholder="Rechercher un service…"
+                   class="min-w-[12rem] flex-1 rounded-full border border-edge bg-glass px-5 py-3 text-ink placeholder:text-mute/70 hc:border-2 hc:border-white hc:bg-black">
+            <x-public.button>Rechercher</x-public.button>
+        </form>
 
-    {{-- D01 / D03 --}}
-    <div class="flex flex-wrap gap-3">
-        <x-public.button :href="url('/services')">Voir les services</x-public.button>
-        @guest
-            <x-public.button variant="alt" :href="route('register')">Créer mon compte</x-public.button>
-            <x-public.button variant="alt" :href="route('login')">Me connecter</x-public.button>
-        @else
-            <x-public.button variant="alt" :href="route('dashboard')">Accéder à mon espace</x-public.button>
-        @endguest
+        <div class="flex flex-wrap gap-3">
+            {{-- NOUVEAU : bouton rouge de signalement --}}
+            <a href="{{ route('signalement') }}"
+               class="inline-flex items-center gap-2 rounded-full bg-red-600 px-6 py-3 font-bold text-white no-underline shadow-lg shadow-red-600/30 transition hover:-translate-y-0.5 hover:bg-red-700 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white hc:border-2 hc:border-white hc:bg-black">
+                <span aria-hidden="true">⚠</span> Signaler un problème
+            </a>
+            <x-public.button variant="alt" :href="route('services.index')">Voir les services</x-public.button>
+            @guest
+                <x-public.button variant="alt" :href="route('register')">Créer mon compte</x-public.button>
+            @else
+                <x-public.button variant="alt" :href="route('dashboard')">Mon espace</x-public.button>
+            @endguest
+        </div>
     </div>
-</x-public.panel>
 
-{{-- D05 / F28 : services principaux --}}
-<x-public.panel class="my-[1.1rem] p-5" aria-labelledby="h-srv">
-    <h2 id="h-srv" class="mb-[.9rem] flex flex-wrap items-baseline justify-between gap-4 font-hud text-[1.125rem] font-bold tracking-[.05em]">
-        Que souhaitez-vous faire ?
-        <a href="{{ url('/services') }}" class="font-sans text-[.95rem] font-medium tracking-normal text-cyan-neon hover:underline hc:underline">Tous les services</a>
-    </h2>
-    <ul class="grid grid-cols-[repeat(auto-fill,minmax(15rem,1fr))] gap-[.9rem]">
-        @foreach ($services as $s)
+    {{-- La pile de verre : chiffres et contenus réels de la base --}}
+    <div class="grid gap-4 lg:relative lg:block lg:h-[440px]" aria-label="Aperçu de la plateforme">
+        <x-public.panel as="div" class="p-5 transition hover:-translate-y-1 lg:absolute lg:left-0 lg:top-0 lg:z-10 lg:w-[90%]">
+            <p class="text-[.78rem] uppercase tracking-widest text-mute">À la une</p>
+            @if ($latest)
+                <h2 class="mt-1 line-clamp-2 font-hud text-[.95rem] font-medium leading-snug"><a href="{{ route('annonces.show', $latest->slug) }}" class="text-ink no-underline hover:text-cyan hc:underline">{{ $latest->title }}</a></h2>
+                <p class="mt-2 line-clamp-2 text-[.95rem] text-mute">{{ $latest->summary }}</p>
+                <time datetime="{{ $latest->published_at->toDateString() }}" class="mt-2 block text-[.85rem] text-cyan">{{ $latest->published_at->locale('fr')->translatedFormat('j F Y') }}</time>
+            @else
+                <p class="mt-2 text-mute">Aucune annonce publiée pour le moment.</p>
+            @endif
+        </x-public.panel>
+
+        <x-public.panel as="div" class="p-5 transition hover:-translate-y-1 lg:absolute lg:right-0 lg:top-[36%] lg:z-20 lg:w-[60%]">
+            <h2 class="font-hud text-[.9rem] font-medium">Services en ligne</h2>
+            <p class="mt-1 font-hud text-[2.1rem] font-light">{{ $stats['services'] }}</p>
+            <div class="mt-2 h-2 overflow-hidden rounded-full border border-edge bg-glass" role="img"
+                 aria-label="{{ $stats['actifs'] }} services disponibles sur {{ $stats['services'] }}">
+                <i class="block h-full rounded-full bg-linear-to-r from-violet to-cyan" style="width: {{ $stats['services'] ? round($stats['actifs'] / $stats['services'] * 100) : 0 }}%"></i>
+            </div>
+            <p class="mt-2 text-[.85rem] text-mute">{{ $stats['actifs'] }} disponible{{ $stats['actifs'] > 1 ? 's' : '' }} · {{ $stats['annonces'] }} annonce{{ $stats['annonces'] > 1 ? 's' : '' }} publiée{{ $stats['annonces'] > 1 ? 's' : '' }}</p>
+        </x-public.panel>
+
+        <x-public.panel as="div" class="p-5 transition hover:-translate-y-1 lg:absolute lg:bottom-0 lg:left-[4%] lg:z-30 lg:w-[56%]">
+            <h2 class="font-hud text-[.9rem] font-medium">Les plus consultés</h2>
+            <ol class="mt-3 grid gap-2 text-[.95rem]">
+                @forelse ($topViewed as $t)
+                    <li class="flex items-center justify-between gap-3">
+                        <a href="{{ route('services.show', $t->slug) }}" class="truncate text-ink no-underline hover:text-cyan hc:underline">{{ $t->tr('name') }}</a>
+                        <span class="shrink-0 text-[.8rem] text-mute">{{ $t->views_count }} vue{{ $t->views_count > 1 ? 's' : '' }}</span>
+                    </li>
+                @empty
+                    <li class="text-mute">Aucun service pour le moment.</li>
+                @endforelse
+            </ol>
+        </x-public.panel>
+    </div>
+</section>
+
+{{-- D07 : que puis-je faire ici ? Quatre accès évidents --}}
+<section class="my-6" aria-labelledby="h-faire">
+    <h2 id="h-faire" class="mb-4 font-hud text-[1.1rem] font-medium">Que voulez-vous faire ?</h2>
+    @php
+        $actions = [
+            ['Trouver un service', 'Santé, voirie, état civil… trouvez celui qui correspond à votre besoin.', route('services.index')],
+            ['Signaler un problème', 'Un lampadaire cassé, une fuite : dites ce qui s\'est passé et où.', route('signalement')],
+            ['Lire les annonces', 'Les informations de la ville, les changements de service.', route('annonces.index')],
+            ['Contacter la mairie', 'Une question ? Envoyez un message et recevez une confirmation.', route('contact')],
+        ];
+    @endphp
+    <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+        @foreach ($actions as [$titre, $desc, $href])
             <li>
-                <a href="{{ url($s['href']) }}"
-                   class="flex h-full flex-col gap-[.35rem] rounded-xl border border-line bg-white/5 p-[1.1rem] text-ink no-underline transition hover:border-cyan-neon hover:shadow-[0_0_18px_rgba(56,232,255,.3)] hc:border-2 hc:border-white hc:bg-black">
-                    <span aria-hidden="true" class="text-[1.9rem] leading-none">{{ $s['ico'] }}</span>
-                    <b class="font-hud text-base font-bold tracking-[.03em]">{{ $s['titre'] }}</b>
-                    <span class="text-mute">{{ $s['desc'] }}</span>
-                    <span class="mt-auto font-bold text-cyan-neon">{{ $s['cta'] }}</span>
+                <a href="{{ $href }}" class="flex h-full flex-col gap-2 rounded-3xl border border-edge bg-linear-to-br from-glass-hi to-glass p-5 text-ink no-underline backdrop-blur-[26px] transition hover:-translate-y-1 hc:border-2 hc:border-white hc:bg-black hc:bg-none">
+                    <b class="font-hud text-[.95rem] font-medium leading-snug">{{ $titre }}</b>
+                    <span class="text-mute">{{ $desc }}</span>
+                    <span class="mt-auto pt-2 font-bold text-cyan">Y aller →</span>
                 </a>
             </li>
         @endforeach
     </ul>
+</section>
+
+{{-- D05 / F28 : services principaux (prioritaires, puis les plus consultés) --}}
+<x-public.panel class="my-6 p-6" aria-labelledby="h-srv">
+    <h2 id="h-srv" class="mb-5 flex flex-wrap items-baseline justify-between gap-4 font-hud text-[1.1rem] font-medium">
+        Les principaux services
+        <a href="{{ route('services.index') }}" class="font-sans text-[.95rem] font-medium text-cyan hover:underline hc:underline">Tous les services →</a>
+    </h2>
+    @if ($services->isEmpty())
+        <p class="rounded-2xl border border-dashed border-edge p-8 text-center text-mute">Aucun service n'est publié pour le moment.</p>
+    @else
+        <ul class="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            @foreach ($services as $s)
+                <x-public.service-card :service="$s" />
+            @endforeach
+        </ul>
+    @endif
 </x-public.panel>
 
-<div class="my-[1.1rem] grid items-start gap-[1.1rem] md:grid-cols-[minmax(0,1fr)_21rem]">
+<div class="my-6 grid items-start gap-6 md:grid-cols-[minmax(0,1fr)_21rem]">
     {{-- D06 : dernières annonces --}}
-    <x-public.panel class="p-5" aria-labelledby="h-news">
-        <h2 id="h-news" class="mb-[.9rem] flex flex-wrap items-baseline justify-between gap-4 font-hud text-[1.125rem] font-bold tracking-[.05em]">
+    <x-public.panel class="p-6" aria-labelledby="h-news">
+        <h2 id="h-news" class="mb-5 flex flex-wrap items-baseline justify-between gap-4 font-hud text-[1.1rem] font-medium">
             Dernières annonces
-            <a href="{{ url('/actualites') }}" class="font-sans text-[.95rem] font-medium tracking-normal text-cyan-neon hover:underline hc:underline">Toutes les annonces</a>
+            <a href="{{ route('annonces.index') }}" class="font-sans text-[.95rem] font-medium text-cyan hover:underline hc:underline">Toutes les annonces →</a>
         </h2>
         <ul class="grid gap-3">
             @forelse ($annonces as $a)
-                @php $d = \Carbon\Carbon::parse($a['date'])->locale('fr'); @endphp
-                <li class="grid gap-1 rounded-xl border border-line bg-white/5 p-[.9rem] sm:grid-cols-[5.5rem_1fr] sm:gap-4 hc:border-2 hc:border-white hc:bg-black">
-                    <time datetime="{{ $d->toDateString() }}" class="font-hud text-[.85rem] font-bold text-cyan-neon">{{ $d->translatedFormat('j M') }}</time>
+                <li class="grid gap-1 rounded-2xl border border-edge bg-glass p-4 sm:grid-cols-[6rem_1fr] sm:gap-4 hc:border-2 hc:bg-black">
+                    <time datetime="{{ $a->published_at->toDateString() }}" class="text-[.85rem] font-bold text-cyan">{{ $a->published_at->locale('fr')->translatedFormat('j M Y') }}</time>
                     <div>
-                        <h3 class="text-[1.2rem] font-semibold"><a href="{{ $a['url'] }}" class="text-ink hover:text-cyan-neon hover:underline hc:underline">{{ $a['titre'] }}</a></h3>
-                        <p class="mt-[.2rem] text-mute">{{ $a['resume'] }}</p>
+                        <h3 class="text-[1.1rem] font-bold"><a href="{{ route('annonces.show', $a->slug) }}" class="text-ink no-underline hover:text-cyan hover:underline hc:underline">{{ $a->title }}</a></h3>
+                        <p class="mt-1 text-mute">{{ $a->summary }}</p>
                     </div>
                 </li>
             @empty
-                <li class="rounded-xl border border-dashed border-line p-6 text-center text-mute">Aucune annonce pour le moment.</li>
+                <li class="rounded-2xl border border-dashed border-edge p-8 text-center text-mute">Aucune annonce pour le moment.</li>
             @endforelse
         </ul>
     </x-public.panel>
 
-    {{-- Pour démarrer (visiteur) / Mon espace (connecté) --}}
-    <x-public.panel as="aside" class="p-5" aria-labelledby="h-how">
+    {{-- D12 / F35 : première visite, étape par étape --}}
+    <x-public.panel as="aside" class="p-6" aria-labelledby="h-how">
+        <h2 id="h-how" class="mb-4 font-hud text-[1.1rem] font-medium">Première visite ?</h2>
+        @php $profilUrl = \Illuminate\Support\Facades\Route::has('profile.edit') ? route('profile.edit') : route('dashboard'); @endphp
+        <ol class="grid gap-4">
+            <li><b class="block text-cyan">1. @guest Créez votre compte @else Votre compte est prêt @endguest</b>
+                @guest <a href="{{ route('register') }}" class="text-ink underline">Quelques informations suffisent.</a> @else C'est fait, merci. @endguest</li>
+            <li><b class="block text-cyan">2. Complétez votre profil</b>
+                @guest Après la connexion, ajoutez vos informations.
+                @else
+                    @php $manque = collect(['firstname' => 'prénom', 'terrarian_chip_number' => 'numéro de puce'])->filter(fn ($l, $k) => blank(auth()->user()->$k))->values(); @endphp
+                    @if ($manque->isEmpty()) ✔ Profil complet, merci.
+                    @else Il manque : {{ $manque->implode(', ') }}. <a href="{{ $profilUrl }}" class="text-ink underline">Compléter mon profil</a>
+                    @endif
+                @endguest</li>
+            <li><b class="block text-cyan">3. Trouvez un service</b><a href="{{ route('services.index') }}" class="text-ink underline">Parcourir les services</a></li>
+            <li><b class="block text-cyan">4. Lancez votre démarche</b>Ouvrez le service, puis écrivez-nous ou signalez un problème. Vous recevez toujours une confirmation.</li>
+        </ol>
         @guest
-            <h2 id="h-how" class="mb-[.9rem] font-hud text-[1.125rem] font-bold tracking-[.05em]">Pour démarrer</h2>
-            <ol class="grid gap-3">
-                <li><b class="block text-cyan-neon">1. Créez votre compte</b>Quelques informations suffisent.</li>
-                <li><b class="block text-cyan-neon">2. Accédez à votre espace</b>Vos démarches y sont réunies.</li>
-                <li><b class="block text-cyan-neon">3. Suivez vos demandes</b>Chaque message reçoit une confirmation.</li>
-            </ol>
-            <x-public.button class="mt-4" :href="route('register')">Créer mon compte</x-public.button>
+            <div class="mt-5 flex flex-wrap gap-3">
+                <x-public.button :href="route('register')">Créer mon compte</x-public.button>
+                <x-public.button variant="alt" :href="route('login')">Me connecter</x-public.button>
+            </div>
         @else
-            <h2 id="h-how" class="mb-[.9rem] font-hud text-[1.125rem] font-bold tracking-[.05em]">Mon espace</h2>
-            <p>Retrouvez vos demandes, leur état et l'historique de vos démarches.</p>
-            <x-public.button class="mt-4" :href="route('dashboard')">Ouvrir mon espace</x-public.button>
+            <x-public.button class="mt-5" :href="route('dashboard')">Ouvrir mon espace</x-public.button>
         @endguest
     </x-public.panel>
 </div>
+
+{{-- Demandes des habitants : soutenir une demande déjà déposée --}}
+<x-public.panel class="my-6 p-6" aria-labelledby="h-dem">
+    <h2 id="h-dem" class="mb-2 flex flex-wrap items-baseline justify-between gap-4 font-hud text-[1.1rem] font-medium">
+        Demandes des habitants
+        <a href="{{ route('demandes.index') }}" class="font-sans text-[.95rem] font-medium text-cyan hover:underline hc:underline">Toutes les demandes →</a>
+    </h2>
+    <p class="mb-5 max-w-[46rem] text-mute">Un problème déjà signalé par un voisin ? Soutenez sa demande plutôt que d'en créer une autre.</p>
+    @if ($reports->isEmpty())
+        <p class="rounded-2xl border border-dashed border-edge p-8 text-center text-mute">Aucune demande pour le moment. <a href="{{ route('signalement') }}" class="text-cyan underline">Signaler un problème</a></p>
+    @else
+        <ul class="grid gap-4 md:grid-cols-3">
+            @foreach ($reports as $r)
+                <x-public.report-card :report="$r" />
+            @endforeach
+        </ul>
+    @endif
+</x-public.panel>
+
+{{-- F21 / D20 / D14 : accessibilité et langues, pour tous les habitants --}}
+<x-public.panel class="my-6 p-6" aria-labelledby="h-acc">
+    <h2 id="h-acc" class="mb-2 font-hud text-[1.1rem] font-medium">Un portail pour tous les habitants</h2>
+    <p class="mb-5 max-w-[46rem] text-mute">Les mêmes services, les mêmes pages et les mêmes démarches pour tout le monde, quel que soit votre outil ou votre langue.</p>
+    <div class="grid gap-4 md:grid-cols-3">
+        <div class="rounded-2xl border border-edge bg-glass p-4 hc:border-2 hc:bg-black">
+            <h3 class="font-bold text-cyan">Lecteur d'écran et clavier</h3>
+            <p class="mt-1 text-[.95rem]">Pages organisées par titres, boutons et champs nommés, erreurs annoncées. Un lien « Aller au contenu » est proposé dès l'arrivée.</p>
+        </div>
+        <div class="rounded-2xl border border-edge bg-glass p-4 hc:border-2 hc:bg-black">
+            <h3 class="font-bold text-cyan">Lisibilité</h3>
+            <p class="mt-1 text-[.95rem]">En haut de chaque page : agrandir ou réduire le texte (A−, A, A+) et activer le contraste élevé.</p>
+        </div>
+        <div class="rounded-2xl border border-edge bg-glass p-4 hc:border-2 hc:bg-black">
+            <h3 class="font-bold text-cyan">Votre langue</h3>
+            @if (count($langs))
+                <p class="mt-1 text-[.95rem]">Choisissez une langue pour lire les services :</p>
+                <p class="mt-2 flex flex-wrap gap-2">
+                    @foreach (array_unique(array_merge(['fr'], $langs)) as $code)
+                        <a href="{{ route('lang', $code) }}" lang="{{ $code }}" hreflang="{{ $code }}" @if (session('lang', 'fr') === $code) aria-current="true" @endif
+                           class="rounded-full border border-edge px-3 py-1 text-ink no-underline hover:bg-glass-hi aria-[current=true]:border-cyan aria-[current=true]:bg-cyan/15 hc:underline">{{ \App\Models\Service::languageLabel($code) }}</a>
+                    @endforeach
+                </p>
+            @else
+                <p class="mt-1 text-[.95rem]">Les contenus sont pour le moment disponibles en français.</p>
+            @endif
+        </div>
+    </div>
+</x-public.panel>
+
+{{-- D13 : les mots difficiles, expliqués simplement (table glossary_terms) --}}
+@if ($terms->isNotEmpty())
+    <x-public.panel class="my-6 p-6" aria-labelledby="h-mots">
+        <h2 id="h-mots" class="mb-4 font-hud text-[1.1rem] font-medium">Les mots simples</h2>
+        <dl class="grid gap-4 md:grid-cols-2">
+            @foreach ($terms as $t)
+                <div class="rounded-2xl border border-edge bg-glass p-4 hc:border-2 hc:bg-black">
+                    <dt class="font-bold text-cyan">{{ $t->term }}</dt>
+                    <dd class="mt-1 text-[.95rem]">{{ $t->definition }}</dd>
+                </div>
+            @endforeach
+        </dl>
+    </x-public.panel>
+@endif
 @endsection
