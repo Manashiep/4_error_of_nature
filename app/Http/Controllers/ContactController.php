@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\ContactMessage;
+use App\Models\Contact;
 use App\Models\Service;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
@@ -33,16 +33,34 @@ class ContactController extends Controller
             'max.string' => 'Le champ « :attribute » ne doit pas dépasser :max caractères.',
             'exists' => 'Choisissez un service dans la liste.',
         ], [
-            'name' => 'nom', 'email' => 'adresse e-mail', 'service' => 'service concerné', 'message' => 'message',
+            'name' => 'nom',
+            'email' => 'adresse e-mail',
+            'service' => 'service concerné',
+            'message' => 'message',
         ]);
 
-        $reference = 'MSG-'.strtoupper(Str::random(6));
+        $service = $request->filled('service') ? Service::where('slug', $request->input('service'))->first() : null;
+        $type = $service ? 'service' : 'general';
 
-        ContactMessage::create($data + [
-            'reference' => $reference,
-            'user_id' => $request->user()?->id,
+        Contact::create([
+            'type' => $type,
+            'service_id' => $service?->id,
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'phone' => $request->input('phone'),
+            'subject' => $service
+                ? 'Question concernant ' . ($service->tr('name') ?: $service->name)
+                : 'Question générale',
+            'message' => $data['message'],
+            'status' => 'nouveau',
         ]);
 
-        return redirect(route('contact').'#confirmation')->with('sent', $reference);
+        if ($service) {
+            return redirect(route('services.show', $service) . '#contact-service')->with('contact_sent', true);
+        }
+
+        $reference = 'MSG-' . strtoupper(Str::random(6));
+
+        return redirect(route('contact') . '#confirmation')->with('sent', $reference);
     }
 }
