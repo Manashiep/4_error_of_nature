@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use App\Models\Announcement;
+use App\Models\Report;
+use App\Observers\ReportObserver;
 use Carbon\CarbonImmutable;
 use Illuminate\Support\Facades\Date;
 use Illuminate\Support\Facades\DB;
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         $this->configureDefaults();
+        Report::observe(ReportObserver::class);
 
         // D18 / F29 / F31 : alertes en bandeau sur toutes les pages publiques
         View::composer('layouts.public', function ($view) {

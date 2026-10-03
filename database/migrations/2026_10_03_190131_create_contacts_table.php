@@ -11,7 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('create_contacts_tables', function (Blueprint $table) {
+        if (Schema::hasTable('contacts')) {
+            return;
+        }
+
+        if (Schema::hasTable('create_contacts_tables')) {
+            Schema::rename('create_contacts_tables', 'contacts');
+
+            return;
+        }
+
+        Schema::create('contacts', function (Blueprint $table) {
            $table->id();
 
             // Différenciation de la demande
@@ -40,6 +50,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('create_contacts_tables');
+        Schema::dropIfExists('contacts');
     }
 };

@@ -3,6 +3,7 @@
 use App\Http\Controllers\ContactController;
 use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\PublicController;
+use App\Http\Controllers\NotificationController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -28,6 +29,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/signalement', [ReportController::class, 'create'])->name('signalement');
     Route::post('/signalement', [ReportController::class, 'store'])->middleware('throttle:10,1')->name('signalement.store');
     Route::post('/demandes/{report:reference}/soutenir', [ReportController::class, 'support'])->middleware('throttle:20,1')->name('demandes.support');
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });
 
 Route::middleware(['auth', 'verified'])->group(function () {

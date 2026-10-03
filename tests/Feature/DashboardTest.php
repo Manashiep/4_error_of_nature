@@ -82,3 +82,69 @@ test('the dashboard shows only the authenticated citizen own reports and message
         ->assertDontSee('Un trou est présent sur la chaussée.')
         ->assertDontSee('SIG-OTHER');
 });
+
+test('a citizen receives a database notification when their report status changes', function () {
+    $user = User::factory()->create();
+    $report = Report::create([
+        'reference' => 'SIG-STATUS1',
+        'user_id' => $user->id,
+        'title' => 'Éclairage public',
+        'description' => 'Un lampadaire est en panne près de chez moi.',
+        'status' => 'pending',
+    ]);
+
+    $report->update(['status' => 'in_progress']);
+
+    expect($user->unreadNotifications)->toHaveCount(1)
+        ->and($user->unreadNotifications->first()->data)->toMatchArray([
+            'report_reference' => 'SIG-STATUS1',
+            'report_title' => 'Éclairage public',
+            'old_status' => 'pending',
+            'new_status' => 'in_progress',
+            'status_label' => 'En cours',
+        ]);
+});
+
+test('citizens can see and mark their notifications as read but cannot access another users notification', function () {
+    $user = User::factory()->create();
+    $anotherUser = User::factory()->create();
+
+    $ownReport = Report::create([
+        'reference' => 'SIG-OWN002',
+        'user_id' => $user->id,
+        'title' => 'Collecte des déchets',
+        'description' => 'La collecte de déchets n’a pas eu lieu.',
+        'status' => 'pending',
+    ]);
+    $ownReport->update(['status' => 'resolved']);
+    $ownNotification = $user->unreadNotifications()->firstOrFail();
+
+    $otherReport = Report::create([
+        'reference' => 'SIG-OTHER2',
+        'user_id' => $anotherUser->id,
+        'title' => 'Voirie',
+        'description' => 'Un trou est présent sur la chaussée.',
+        'status' => 'pending',
+    ]);
+    $otherReport->update(['status' => 'rejected']);
+    $otherNotification = $anotherUser->unreadNotifications()->firstOrFail();
+
+    $this->actingAs($user)
+        ->get(route('dashboard'))
+        ->assertOk()
+        ->assertSee('Notifications')
+        ->assertSee('>1<', false);
+
+    $this->get(route('notifications.index'))
+        ->assertOk()
+        ->assertSee('Collecte des déchets')
+        ->assertDontSee('SIG-OTHER2');
+
+    $this->post(route('notifications.read', $otherNotification->id))
+        ->assertNotFound();
+    $this->post(route('notifications.read', $ownNotification->id))
+        ->assertRedirect(route('notifications.index'));
+
+    expect($user->fresh()->unreadNotifications)->toHaveCount(0)
+        ->and($anotherUser->fresh()->unreadNotifications)->toHaveCount(1);
+});
