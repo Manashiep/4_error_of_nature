@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Models;
-
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Database\Factories\UserFactory;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Database\Eloquent\Attributes\Fillable;
@@ -47,6 +47,14 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             'password' => 'hashed',
         ];
     }
+    protected $fillable = [
+    'name',
+    'firstname',
+    'email',
+    'terrarian_chip_number',
+    'password',
+    'role',
+];
 
     /**
      * Get the user's initials
@@ -59,4 +67,8 @@ class User extends Authenticatable implements MustVerifyEmail, PasskeyUser
             ? Str::substr($initials, 0, 1).Str::substr($initials, -1)
             : $initials;
     }
+    public function agentProfile(): HasOne
+      {
+    return $this->hasOne(AgentProfile::class);
+        }
 }
