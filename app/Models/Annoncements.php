@@ -84,6 +84,28 @@ class Annoncements extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        return $this->image_path ? asset('storage/' . $this->image_path) : null;
+        $path = $this->image_path;
+
+        if (! filled($path)) {
+            return null;
+        }
+
+        if (Str::startsWith($path, ['http://', 'https://', '//'])) {
+            return $path;
+        }
+
+        if (Str::startsWith($path, '/storage/')) {
+            $path = Str::after($path, '/storage/');
+        } elseif (Str::startsWith($path, '/')) {
+            return $path;
+        }
+
+        // Les chemins Filament sont relatifs à storage/app/public.
+        $path = Str::after($path, 'public/');
+        $path = Str::after($path, 'storage/');
+
+        // Utilise l'origine de la requête courante plutôt qu'APP_URL, qui peut
+        // contenir un hôte ou un port différent en local.
+        return asset('storage/'.$path);
     }
 }

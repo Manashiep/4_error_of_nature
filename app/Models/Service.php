@@ -57,15 +57,28 @@ class Service extends Model
 
     public function getImageUrlAttribute(): ?string
     {
-        if (! $this->image_path) {
+        $path = $this->image_path;
+
+        if (! filled($path)) {
             return null;
         }
 
-        if (Str::startsWith($this->image_path, ['http://', 'https://', '/'])) {
-            return $this->image_path;
+        if (Str::startsWith($path, ['http://', 'https://', '//'])) {
+            return $path;
         }
 
-        // Tolère un chemin enregistré avec le préfixe "public/"
-        return asset('storage/'.ltrim(Str::after($this->image_path, 'public/'), '/'));
+        if (Str::startsWith($path, '/storage/')) {
+            $path = Str::after($path, '/storage/');
+        } elseif (Str::startsWith($path, '/')) {
+            return $path;
+        }
+
+        // Les uploads Filament sont stockés sur le disque public, sans préfixe.
+        $path = Str::after($path, 'public/');
+        $path = Str::after($path, 'storage/');
+
+        // Utilise l'origine de la requête courante plutôt qu'APP_URL, qui peut
+        // contenir un hôte ou un port différent en local.
+        return asset('storage/'.$path);
     }
 }
