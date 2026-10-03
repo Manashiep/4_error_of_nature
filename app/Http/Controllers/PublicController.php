@@ -6,6 +6,7 @@ use App\Models\Annoncements;
 use App\Models\GlossaryTerm;
 use App\Models\Report;
 use App\Models\Service;
+use App\Models\Transport;
 use Illuminate\Http\Request;
 
 /** Pages publiques (sans connexion) : tout vient de la base, rien en dur. */
@@ -53,10 +54,26 @@ class PublicController extends Controller
         ]);
     }
 
-    // Page Transport : les services de la catégorie « Transport »
-    public function transport()
+    // Page Transport : lignes, état du trafic, alertes et services
+    public function transport(Request $request)
     {
+        $types = Transport::active()->distinct()->orderBy('type')->pluck('type');
+        $type = $request->query('type');
+        $type = $types->contains($type) ? $type : null;
+
         return view('transport', [
+            'lines' => Transport::active()
+                ->when($type, fn ($b) => $b->where('type', $type))
+                ->orderBy('code')
+                ->get(),
+            'types' => $types,
+            'type' => $type,
+            'disrupted' => Transport::active()->disrupted()->orderBy('code')->get(),
+            'alerts' => Annoncements::published()
+                ->whereIn('category', ['Travaux', 'Alerte'])
+                ->latest('published_at')
+                ->take(3)
+                ->get(),
             'services' => Service::where('category', 'Transport')->ranked()->get(),
         ]);
     }

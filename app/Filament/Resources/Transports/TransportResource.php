@@ -18,9 +18,15 @@ class TransportResource extends Resource
 {
     protected static ?string $model = Transport::class;
 
-    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedRectangleStack;
+    protected static string|BackedEnum|null $navigationIcon = Heroicon::OutlinedTruck;
 
-    protected static ?string $recordTitleAttribute = 'Transport';
+    protected static ?string $recordTitleAttribute = 'name';
+
+    protected static ?string $modelLabel = 'ligne de transport';
+
+    protected static ?string $pluralModelLabel = 'lignes de transport';
+
+    protected static ?string $navigationLabel = 'Transports';
 
     public static function form(Schema $schema): Schema
     {

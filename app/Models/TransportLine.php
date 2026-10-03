@@ -5,10 +5,8 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 
-class Transport extends Model
+class TransportLine extends Model
 {
-    protected $table = 'transports';
-
     protected $fillable = [
         'name', 'code', 'type', 'frequency', 'route_description',
         'schedules', 'status', 'status_message', 'is_active',

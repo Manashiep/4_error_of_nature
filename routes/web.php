@@ -1,8 +1,8 @@
 <?php
 
 use App\Http\Controllers\ContactController;
-use App\Http\Controllers\PublicController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PublicController;
 use App\Http\Controllers\ReportController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,7 +33,5 @@ Route::middleware('auth')->group(function () {
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
 });
-use App\Http\Controllers\ActualiteController;
-
 
 require __DIR__.'/settings.php';
