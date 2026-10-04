@@ -87,14 +87,35 @@
             <li><b class="block text-cyan">Consultations</b>{{ $service->views_count }} fois</li>
         </ul>
 
-        @if (session('contact_sent'))
-            <div id="contact-service" role="status" class="mt-5 rounded-2xl border-2 border-ok bg-ok/10 p-4 hc:border-white hc:bg-black">
-                <p class="font-bold text-ok">✔ Message envoyé.</p>
-                <p>Votre demande a bien été transmise au service {{ $service->tr('name') }}.</p>
+        @if (session('appointment_requested'))
+            <div id="appointment-status" role="status" class="mt-5 rounded-2xl border-2 border-ok bg-ok/10 p-4 hc:border-white hc:bg-black">
+                <p class="font-bold text-ok">✔ Demande de rendez-vous envoyée.</p>
+                <p>Le service {{ $service->tr('name') }} étudiera votre demande. Vous pourrez suivre sa réponse dans votre espace citoyen.</p>
             </div>
         @endif
 
-        <form method="POST" action="{{ route('contact.store') }}" novalidate class="mt-5 grid gap-4" id="contact-service-form">
+        @auth
+            <form method="POST" action="{{ route('appointments.store', $service) }}" class="mt-5 grid gap-4" id="appointment-form">
+                @csrf
+                <h3 class="font-medium text-ink">Demander un rendez-vous</h3>
+                <label for="requested_at" class="grid gap-1 text-sm font-medium text-ink">
+                    Date et heure souhaitées
+                    <input id="requested_at" name="requested_at" type="datetime-local" min="{{ now()->addMinute()->format('Y-m-d\TH:i') }}" value="{{ old('requested_at') }}" required class="rounded-xl border border-edge bg-glass px-3 py-2 text-ink">
+                    @error('requested_at')
+                        <span class="text-sm text-err">{{ $message }}</span>
+                    @enderror
+                </label>
+                <x-public.field name="message" label="Motif du rendez-vous" type="textarea" required help="Décrivez brièvement votre demande (10 caractères minimum)." />
+                <x-public.button class="w-full">Demander ce rendez-vous</x-public.button>
+            </form>
+        @else
+            <div id="appointment-status" class="mt-5 rounded-2xl border border-edge bg-glass p-4">
+                <p class="text-sm text-mute">Connectez-vous pour demander un rendez-vous et retrouver la réponse du service dans votre espace citoyen.</p>
+                <x-public.button :href="route('login')" class="mt-3 w-full">Se connecter</x-public.button>
+            </div>
+        @endauth
+
+        <form method="POST" action="{{ route('contact.store') }}" novalidate class="mt-6 grid gap-4 border-t border-edge pt-5" id="contact-service-form">
             @csrf
 
             {{-- Honeypot : champ piège invisible anti-bot --}}
@@ -103,10 +124,11 @@
             </div>
 
             <input type="hidden" name="service" value="{{ $service->slug }}">
+            <h3 class="font-medium text-ink">Poser une question au service</h3>
             <x-public.field name="name" label="Nom" required autocomplete="name" :value="auth()->user()?->name" />
             <x-public.field name="email" label="Adresse e-mail" type="email" required autocomplete="email" :value="auth()->user()?->email" />
             <x-public.field name="message" label="Votre message" type="textarea" required help="Décrivez précisément votre demande ou votre difficulté." />
-            <x-public.button class="w-full">Prendre rendez-vous</x-public.button>
+            <x-public.button class="w-full">Envoyer une question</x-public.button>
         </form>
     </x-public.panel>
 </div>

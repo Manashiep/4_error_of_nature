@@ -2,17 +2,12 @@
 
 namespace App\Filament\Resources\Contacts\Tables;
 
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Actions\BulkActionGroup;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
-use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Actions\DeleteAction;
-use Filament\Tables\Table;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Table;
 
 class ContactsTable
 {
@@ -42,6 +37,12 @@ class ContactsTable
                     ->label('Service ciblé')
                     ->placeholder('Global / Mairie'),
 
+                TextColumn::make('requested_at')
+                    ->label('Créneau demandé')
+                    ->dateTime('d/m/Y H:i')
+                    ->placeholder('—')
+                    ->sortable(),
+
                 TextColumn::make('name')
                     ->label('Expéditeur')
                     ->searchable(),
@@ -67,11 +68,12 @@ class ContactsTable
                         'general' => 'Questions Générales',
                         'service' => 'Demandes de Services',
                     ]),
-               SelectFilter::make('status')
+                SelectFilter::make('status')
                     ->options([
                         'nouveau' => 'Nouveaux',
                         'en_cours' => 'En cours',
                         'traite' => 'Traités',
+                        'archive' => 'Archivés / refusés',
                     ]),
             ])
             ->recordActions([

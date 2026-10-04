@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\Contact;
 use App\Models\ContactMessage;
 use App\Models\Report;
 use App\Models\User;
@@ -17,7 +18,11 @@ test('authenticated users can visit the dashboard', function () {
     $this->actingAs($user);
 
     $response = $this->get(route('dashboard'));
-    $response->assertOk();
+    $response->assertOk()
+        ->assertDontSee('Repository')
+        ->assertDontSee('Documentation')
+        ->assertDontSee('https://github.com/laravel/livewire-starter-kit')
+        ->assertDontSee('https://laravel.com/docs/starter-kits#livewire');
 });
 
 test('citizens can log out from the dashboard menu', function () {
@@ -81,6 +86,58 @@ test('the dashboard shows only the authenticated citizen own reports and message
         ->assertSee('>1<', false)
         ->assertDontSee('Un trou est présent sur la chaussée.')
         ->assertDontSee('SIG-OTHER');
+});
+
+test('citizens can paginate their complete request and appointment histories', function () {
+    $user = User::factory()->create();
+
+    for ($index = 1; $index <= 12; $index++) {
+        $createdAt = now()->subDays($index);
+
+        $report = Report::create([
+            'reference' => 'SIG-HIST'.str_pad((string) $index, 2, '0', STR_PAD_LEFT),
+            'user_id' => $user->id,
+            'title' => 'Signalement historique '.$index,
+            'description' => 'Description de la demande.',
+            'status' => 'pending',
+        ]);
+        $report->forceFill(['created_at' => $createdAt, 'updated_at' => $createdAt])->save();
+
+        ContactMessage::create([
+            'reference' => 'MSG-HIST'.str_pad((string) $index, 2, '0', STR_PAD_LEFT),
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'service' => 'Service historique '.$index,
+            'message' => 'Message historique.',
+            'status' => 'nouveau',
+            'created_at' => $createdAt,
+            'updated_at' => $createdAt,
+        ]);
+
+        $appointment = Contact::create([
+            'type' => 'service',
+            'user_id' => $user->id,
+            'name' => $user->name,
+            'email' => $user->email,
+            'subject' => 'Rendez-vous historique '.$index,
+            'message' => 'Demande de rendez-vous.',
+            'requested_at' => now()->addDays($index),
+            'status' => 'nouveau',
+        ]);
+        $appointment->forceFill(['created_at' => $createdAt, 'updated_at' => $createdAt])->save();
+    }
+
+    $this->actingAs($user)
+        ->get(route('dashboard', ['activityPage' => 2, 'appointmentsPage' => 2]))
+        ->assertOk()
+        ->assertSee('Historique de mes démarches')
+        ->assertSee('SIG-HIST06')
+        ->assertSee('MSG-HIST06')
+        ->assertSee('Rendez-vous historique 11')
+        ->assertDontSee('SIG-HIST01')
+        ->assertSee('activityPage=2', false)
+        ->assertSee('appointmentsPage=2', false);
 });
 
 test('a citizen receives a database notification when their report status changes', function () {

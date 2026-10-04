@@ -58,6 +58,9 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/signalement', [ReportController::class, 'create'])->name('signalement');
     Route::post('/signalement', [ReportController::class, 'store'])->middleware('throttle:10,1')->name('signalement.store');
     Route::post('/demandes/{report:reference}/soutenir', [ReportController::class, 'support'])->middleware('throttle:20,1')->name('demandes.support');
+    Route::post('/services/{service:slug}/appointments', [ContactController::class, 'requestAppointment'])
+        ->middleware('throttle:6,1')
+        ->name('appointments.store');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 
@@ -72,4 +75,11 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::get('/verify-2fa', [TwoFactorController::class, 'index'])->name('2fa.index');
 Route::post('/verify-2fa', [TwoFactorController::class, 'verify'])->name('2fa.verify');
 
+<<<<<<< HEAD
+=======
+Route::post('/login', [AuthController::class, 'login'])
+    ->middleware('throttle:login')
+    ->name('login.store');
+
+>>>>>>> e36dd8463ddb3f3a12465b3d9ab2b8da0f9106e7
 require __DIR__.'/settings.php';

@@ -11,15 +11,18 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('contacts', function (Blueprint $table) {
-            Schema::table('contacts', function (Blueprint $table) {
-            // Créneaux horaires
-            $table->dateTime('requested_at')->nullable()->after('message'); // Créneau souhaité par l'habitant
-            $table->dateTime('confirmed_at')->nullable()->after('requested_at'); // Horaire accordé par l'agent
+        Schema::table('contacts', function (Blueprint $table): void {
+            if (! Schema::hasColumn('contacts', 'requested_at')) {
+                $table->dateTime('requested_at')->nullable();
+            }
 
-            // Raison du refus ou consignes
-            $table->text('rejection_reason')->nullable()->after('confirmed_at');
-        });
+            if (! Schema::hasColumn('contacts', 'confirmed_at')) {
+                $table->dateTime('confirmed_at')->nullable();
+            }
+
+            if (! Schema::hasColumn('contacts', 'rejection_reason')) {
+                $table->text('rejection_reason')->nullable();
+            }
         });
     }
 
@@ -29,11 +32,14 @@ return new class extends Migration
     public function down(): void
     {
         Schema::table('contacts', function (Blueprint $table) {
-            $table->dropColumn([
-                'requested_at',
-                'confirmed_at',
-                'rejection_reason',
-            ]);
+            $columns = array_values(array_filter(
+                ['requested_at', 'confirmed_at', 'rejection_reason'],
+                fn (string $column): bool => Schema::hasColumn('contacts', $column),
+            ));
+
+            if ($columns !== []) {
+                $table->dropColumn($columns);
+            }
         });
     }
 };
