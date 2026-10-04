@@ -28,10 +28,12 @@
         {{ $announcement->title }}
     </h1>
 
-    {{-- URL de l'image normalisée par le modèle et le disque public --}}
+    {{-- URL de l'image normalisée par le modèle et le disque public (Optimisée Éco-conception E01) --}}
     @if ($announcement->image_url)
         <img src="{{ $announcement->image_url }}"
              alt="{{ $announcement->title }}"
+             loading="lazy"
+             decoding="async"
              class="mt-5 max-h-[24rem] w-full rounded-2xl object-cover border border-edge/40">
     @endif
 

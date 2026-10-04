@@ -36,8 +36,13 @@
                 </div>
             @endunless
 
+            {{-- Optimisation Éco-conception (E01) : chargement paresseux et décodage asynchrone --}}
             @if ($service->image_url)
-                <img src="{{ $service->image_url }}" alt="" class="mt-6 max-h-72 w-full rounded-3xl object-cover">
+                <img src="{{ $service->image_url }}"
+                     alt=""
+                     loading="lazy"
+                     decoding="async"
+                     class="mt-6 max-h-72 w-full rounded-3xl object-cover">
             @endif
 
             <div class="mt-6 grid max-w-[46rem] gap-4 text-[1.05rem] leading-relaxed">
