@@ -18,7 +18,11 @@ test('authenticated users can visit the dashboard', function () {
     $this->actingAs($user);
 
     $response = $this->get(route('dashboard'));
-    $response->assertOk();
+    $response->assertOk()
+        ->assertDontSee('Repository')
+        ->assertDontSee('Documentation')
+        ->assertDontSee('https://github.com/laravel/livewire-starter-kit')
+        ->assertDontSee('https://laravel.com/docs/starter-kits#livewire');
 });
 
 test('citizens can log out from the dashboard menu', function () {
