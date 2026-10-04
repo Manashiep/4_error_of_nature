@@ -58,15 +58,37 @@ class ServiceForm
                             ->columnSpanFull(),
                     ])->columns(2),
 
+                Section::make('Localisation & Horaires (Req. F39)')
+                    ->schema([
+                        TextInput::make('address')
+                            ->label('Adresse physique')
+                            ->placeholder('ex: 12 Rue de la Mairie, Nova Terra')
+                            ->maxLength(255)
+                            ->columnSpanFull(),
+
+                        Textarea::make('opening_hours')
+                            ->label('Horaires d’ouverture')
+                            ->placeholder("ex: Lundi - Vendredi : 8h00 - 16h30\nSamedi : 8h00 - 12h00")
+                            ->rows(3),
+
+                        TextInput::make('latitude')
+                            ->label('Latitude GPS (Optionnel)')
+                            ->placeholder('ex: -11.7022'),
+
+                        TextInput::make('longitude')
+                            ->label('Longitude GPS (Optionnel)')
+                            ->placeholder('ex: 43.2551'),
+                    ])->columns(3),
+
                 Section::make('Médias & Contacts')
                     ->schema([
-                        FileUpload::make('image_path') // ou 'image' selon le nom dans ta BDD
-    ->label('Image du service')
-    ->image()
-    ->disk('public')
-    ->directory('services')
-    ->visibility('public')
-    ->preserveFilenames(),
+                        FileUpload::make('image_path')
+                            ->label('Image du service')
+                            ->image()
+                            ->disk('public')
+                            ->directory('services')
+                            ->visibility('public')
+                            ->preserveFilenames(),
 
                         TextInput::make('contact_email')
                             ->label('Courriel de contact')

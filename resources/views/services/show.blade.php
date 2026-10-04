@@ -51,8 +51,28 @@
     </div>
 
     <x-public.panel as="aside" class="p-6" aria-labelledby="h-c">
-        <h2 id="h-c" class="mb-4 font-hud text-[1rem] font-medium">Contacter ce service</h2>
+        <h2 id="h-c" class="mb-4 font-hud text-[1rem] font-medium">Localiser & contacter ce service</h2>
+
         <ul class="grid gap-3 text-[.98rem]">
+            {{-- F39 : Adresse physique et itinéraire GPS instantané --}}
+            <li>
+                <b class="block text-cyan">Adresse</b>
+                <span class="text-ink">{{ $service->address ?: 'Hôtel de Ville - Place de la Mairie, Nova Terra' }}</span>
+                <a href="https://www.google.com/maps/search/?api=1&query={{ urlencode(($service->address ?: 'Hôtel de Ville Nova Terra') . ' ' . $service->tr('name')) }}"
+                   target="_blank"
+                   rel="noopener noreferrer"
+                   class="mt-1 inline-flex items-center gap-1 font-bold text-cyan hover:underline hc:underline text-[.88rem]"
+                   aria-label="Ouvrir l'itinéraire vers {{ $service->tr('name') }} sur une carte">
+                    📍 Obtenir l'itinéraire
+                </a>
+            </li>
+
+            {{-- Horaires d'ouverture --}}
+            <li>
+                <b class="block text-cyan">Horaires</b>
+                <span class="whitespace-pre-line text-mute">{{ $service->opening_hours ?: "Lundi - Vendredi : 8h00 - 16h30" }}</span>
+            </li>
+
             @if ($service->contact_phone)
                 <li><b class="block text-cyan">Téléphone</b><a class="text-ink hover:underline" href="tel:{{ preg_replace('/[^+\d]/', '', $service->contact_phone) }}">{{ $service->contact_phone }}</a></li>
             @endif

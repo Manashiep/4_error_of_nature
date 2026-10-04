@@ -2,17 +2,17 @@
 
 namespace App\Filament\Resources\Services\Tables;
 
-use Filament\Tables\Columns\ImageColumn;
 use Filament\Actions\BulkActionGroup;
+use Filament\Actions\DeleteAction;
 use Filament\Actions\DeleteBulkAction;
 use Filament\Actions\EditAction;
-use Filament\Actions\ViewAction;
 use Filament\Tables\Columns\IconColumn;
-use Filament\Tables\Filters\TernaryFilter;
-use Filament\Actions\DeleteAction;
-use Filament\Tables\Table;
+use Filament\Tables\Columns\ImageColumn;
 use Filament\Tables\Columns\TextColumn;
 use Filament\Tables\Filters\SelectFilter;
+use Filament\Tables\Filters\TernaryFilter;
+use Filament\Tables\Table;
+
 class ServicesTable
 {
     public static function configure(Table $table): Table
@@ -33,6 +33,13 @@ class ServicesTable
                     ->label('Catégorie')
                     ->badge()
                     ->sortable(),
+
+                // Colonne Localisation (Req. F39)
+                TextColumn::make('address')
+                    ->label('Adresse physique')
+                    ->placeholder('Non renseignée')
+                    ->searchable()
+                    ->toggleable(isToggledHiddenByDefault: false),
 
                 TextColumn::make('views_count')
                     ->label('Consultations (Clics)')
@@ -58,6 +65,7 @@ class ServicesTable
                     ->options([
                         'Général' => 'Général',
                         'Voirie & Infrastructure' => 'Voirie & Infrastructure',
+                        'Transport' => 'Transport',
                         'Santé & Social' => 'Santé & Social',
                         'État Civil & Administratif' => 'État Civil & Administratif',
                         'Environnement & Propreté' => 'Environnement & Propreté',
@@ -72,18 +80,6 @@ class ServicesTable
                 DeleteAction::make(),
             ])
             ->bulkActions([
-                BulkActionGroup::make([
-                DeleteBulkAction::make(),
-                ]),
-            ])
-
-            ->filters([
-                //
-            ])
-            ->recordActions([
-                EditAction::make(),
-            ])
-            ->toolbarActions([
                 BulkActionGroup::make([
                     DeleteBulkAction::make(),
                 ]),
