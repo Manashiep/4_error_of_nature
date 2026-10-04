@@ -44,6 +44,9 @@ Route::middleware('auth')->group(function () {
     Route::get('/signalement', [ReportController::class, 'create'])->name('signalement');
     Route::post('/signalement', [ReportController::class, 'store'])->middleware('throttle:10,1')->name('signalement.store');
     Route::post('/demandes/{report:reference}/soutenir', [ReportController::class, 'support'])->middleware('throttle:20,1')->name('demandes.support');
+    Route::post('/services/{service:slug}/appointments', [ContactController::class, 'requestAppointment'])
+        ->middleware('throttle:6,1')
+        ->name('appointments.store');
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::post('/notifications/{notification}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
 });

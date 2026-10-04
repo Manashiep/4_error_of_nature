@@ -13,6 +13,7 @@
 <section id="alerts-zone" aria-label="Alertes de la ville" aria-live="polite"
          data-url="{{ route('alerts.active') }}" data-sig="{{ $sig }}"
          class="my-6" @if ($alerts->isEmpty()) hidden @endif>
+    <h2 class="mb-3 font-hud text-[1.1rem] font-medium">Travaux et alertes</h2>
     <div id="alerts-list" class="grid gap-3">
         @foreach ($alerts as $a)
             <div role="alert" data-alert-id="{{ $a->id }}"
