@@ -25,6 +25,12 @@
 
         <form method="POST" action="{{ route('contact.store') }}" novalidate>
             @csrf
+
+            {{-- Honeypot : champ piège invisible pour piéger les bots --}}
+            <div style="display: none;" aria-hidden="true">
+                <input type="text" name="website_hp" id="website_hp" tabindex="-1" autocomplete="off">
+            </div>
+
             <x-public.field name="name" label="Nom" required autocomplete="name" :value="auth()->user()?->name" />
             <x-public.field name="email" label="Adresse e-mail" type="email" required autocomplete="email" :value="auth()->user()?->email" />
             <x-public.field name="service" label="Service concerné" type="select">

@@ -21,6 +21,25 @@ class ContactController extends Controller
 
     public function store(Request $request): RedirectResponse
     {
+        // 1. HONEYPOT : Si le champ piège est rempli, c'est un robot !
+        if ($request->filled('website_hp')) {
+            $serviceSlug = $request->input('service');
+            $service = $serviceSlug ? Service::where('slug', $serviceSlug)->first() : null;
+
+            // Feinte pour la page de détail d'un service
+            if ($service) {
+                return redirect(route('services.show', $service) . '#contact-service')
+                    ->with('contact_sent', true);
+            }
+
+            // Feinte pour la page de contact générale
+            $fakeReference = 'MSG-' . strtoupper(Str::random(6));
+
+            return redirect(route('contact') . '#confirmation')
+                ->with('sent', $fakeReference);
+        }
+
+        // 2. VALIDATION NORMALE
         $data = $request->validate([
             'name' => ['required', 'string', 'max:120'],
             'email' => ['required', 'email', 'max:190'],
@@ -42,6 +61,7 @@ class ContactController extends Controller
         $service = $request->filled('service') ? Service::where('slug', $request->input('service'))->first() : null;
         $type = $service ? 'service' : 'general';
 
+        // 3. ENREGISTREMENT BDD
         Contact::create([
             'type' => $type,
             'service_id' => $service?->id,
@@ -55,6 +75,7 @@ class ContactController extends Controller
             'status' => 'nouveau',
         ]);
 
+        // 4. REDIRECTION & CONFIRMATION
         if ($service) {
             return redirect(route('services.show', $service) . '#contact-service')->with('contact_sent', true);
         }

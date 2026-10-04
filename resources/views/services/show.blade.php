@@ -71,6 +71,12 @@
 
         <form method="POST" action="{{ route('contact.store') }}" novalidate class="mt-5 grid gap-4" id="contact-service-form">
             @csrf
+
+            {{-- Honeypot : champ piège invisible anti-bot --}}
+            <div style="display: none;" aria-hidden="true">
+                <input type="text" name="website_hp" id="website_hp" tabindex="-1" autocomplete="off">
+            </div>
+
             <input type="hidden" name="service" value="{{ $service->slug }}">
             <x-public.field name="name" label="Nom" required autocomplete="name" :value="auth()->user()?->name" />
             <x-public.field name="email" label="Adresse e-mail" type="email" required autocomplete="email" :value="auth()->user()?->email" />
