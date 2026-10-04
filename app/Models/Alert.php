@@ -10,7 +10,7 @@ use Illuminate\Support\Facades\Notification;
 class Alert extends Model
 {
     protected $fillable = [
-        'title', 'summary', 'body', 'category', 'level',
+        'title', 'summary', 'body', 'category', 'level','user_id',
         'is_active', 'published_at', 'expires_at',
     ];
 

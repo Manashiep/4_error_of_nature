@@ -23,7 +23,11 @@ class ServicesTable
                     ->label('Illustration')
                     ->disk('public')
                     ->square(),
-
+                TextColumn::make('user.name')
+                    ->label('Auteur')
+                    ->placeholder('Administration')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('name')
                     ->label('Nom du service')
                     ->searchable()

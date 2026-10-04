@@ -15,6 +15,11 @@ class AlertsTable
     {
         return $table
             ->columns([
+                TextColumn::make('user.name')
+                    ->label('Auteur')
+                    ->placeholder('Administration')
+                    ->searchable()
+                    ->sortable(),
                 TextColumn::make('title')
                     ->label('Titre')
                     ->searchable()

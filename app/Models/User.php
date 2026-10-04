@@ -58,6 +58,8 @@ class User extends Authenticatable implements FilamentUser
     'name',
     'firstname',
     'email',
+    'two_factor_code',          // <-- Ajoute ceci
+    'two_factor_expires_at',
     'terrarian_chip_number',
     'password',
     'role',
