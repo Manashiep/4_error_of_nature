@@ -20,14 +20,16 @@
                 <h2 class="font-hud text-[1.05rem] font-medium">
                     <span aria-hidden="true">⚠</span>
                     <span class="mr-2 rounded-full border border-current px-2.5 py-0.5 text-[.75rem]">{{ $labels[$a->level] ?? 'Information' }}</span>
-                    {{ $a->title }}
+                    <a href="{{ route('alerts.show', $a) }}" class="text-ink no-underline hover:underline">{{ $a->title }}</a>
                 </h2>
                 @if ($a->summary)
                     <p class="mt-1">{{ $a->summary }}</p>
                 @endif
+                <a href="{{ route('alerts.show', $a) }}" class="mt-2 inline-block font-bold underline hover:no-underline">Voir le détail →</a>
             </div>
         @endforeach
     </div>
+    <p class="mt-3 text-right text-[.95rem]"><a href="{{ route('alerts.index') }}" class="font-bold text-cyan hover:underline hc:underline">Toutes les alertes →</a></p>
 </section>
 
 <script>
@@ -58,7 +60,11 @@
             const badge = document.createElement('span');
             badge.className = 'mr-2 rounded-full border border-current px-2.5 py-0.5 text-[.75rem]';
             badge.textContent = labels[a.level] || 'Information';
-            h.append(icon, badge, a.title);
+            const link = document.createElement('a');
+            link.href = a.url;
+            link.className = 'text-ink no-underline hover:underline';
+            link.textContent = a.title;
+            h.append(icon, badge, link);
             box.appendChild(h);
 
             if (a.summary) {
@@ -67,6 +73,12 @@
                 p.textContent = a.summary;
                 box.appendChild(p);
             }
+
+            const more = document.createElement('a');
+            more.href = a.url;
+            more.className = 'mt-2 inline-block font-bold underline hover:no-underline';
+            more.textContent = 'Voir le détail →';
+            box.appendChild(more);
             return box;
         }));
         zone.hidden = alerts.length === 0;

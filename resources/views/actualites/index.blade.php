@@ -4,6 +4,23 @@
 <x-public.breadcrumb :items="[['Annonces']]" />
 <x-public.page-hero title="Annonces de la ville" lead="Annonces municipales, changements de service et informations pratiques." />
 
+{{-- Alertes de la ville en cours : consultables une par une --}}
+<x-public.panel class="my-6 p-6" aria-labelledby="h-alertes">
+    <h2 id="h-alertes" class="mb-4 flex flex-wrap items-baseline justify-between gap-4 font-hud text-[1.1rem] font-medium">
+        Alertes de la ville
+        <a href="{{ route('alerts.index') }}" class="font-sans text-[.95rem] font-medium text-cyan hover:underline hc:underline">Toutes les alertes →</a>
+    </h2>
+    @if ($alerts->isEmpty())
+        <p class="rounded-2xl border border-dashed border-edge p-6 text-center text-mute">Aucune alerte en cours.</p>
+    @else
+        <ul class="grid gap-3">
+            @foreach ($alerts as $al)
+                @include('partials.public.alert-card', ['a' => $al])
+            @endforeach
+        </ul>
+    @endif
+</x-public.panel>
+
 <x-public.panel class="my-6 p-6" aria-labelledby="h-a">
     <h2 id="h-a" class="mb-5 font-hud text-[1.1rem] font-medium">Publications récentes</h2>
 

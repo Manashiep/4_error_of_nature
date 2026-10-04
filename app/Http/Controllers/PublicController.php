@@ -92,7 +92,7 @@ class PublicController extends Controller
         ]);
     }
 
-    // D06 : liste des annonces
+    // D06 : liste des annonces (avec les alertes en cours en haut de page)
     public function announcements(Request $request)
     {
         $categories = Annoncements::published()->distinct()->orderBy('category')->pluck('category');
@@ -100,6 +100,7 @@ class PublicController extends Controller
         $cat = $categories->contains($cat) ? $cat : null;
 
         return view('actualites.index', [
+            'alerts' => Alert::current()->urgentFirst()->take(3)->get(),
             'items' => Annoncements::published()
                 ->when($cat, fn ($b) => $b->where('category', $cat))
                 ->latest('published_at')
