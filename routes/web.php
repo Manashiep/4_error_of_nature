@@ -75,11 +75,8 @@ Route::middleware(['auth', 'verified'])->group(function () {
 Route::get('/verify-2fa', [TwoFactorController::class, 'index'])->name('2fa.index');
 Route::post('/verify-2fa', [TwoFactorController::class, 'verify'])->name('2fa.verify');
 
-<<<<<<< HEAD
-=======
 Route::post('/login', [AuthController::class, 'login'])
     ->middleware('throttle:login')
     ->name('login.store');
 
->>>>>>> e36dd8463ddb3f3a12465b3d9ab2b8da0f9106e7
 require __DIR__.'/settings.php';
